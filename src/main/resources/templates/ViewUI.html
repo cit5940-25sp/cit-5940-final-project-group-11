@@ -44,7 +44,13 @@
             justify-content: space-between;
             align-items: center;
             width: 90%;
+            margin-top: 20px;
             padding: 1em;
+            flex: 0 0 auto;
+            background-color: white;
+            z-index: 1;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
         }
         .game-info-left, .game-info-right {
             text-align: left;
@@ -58,35 +64,62 @@
             padding: 0.5em;
             font-size: 1em;
         }
+        .game-scrollable {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding-bottom: 2em; /* So content doesn't touch the bottom */
+            width: 100%;
+        }
         .game-middle {
             display: flex;
-            justify-content: space-around;
-            align-items: center;
-            width: 90%;
-            margin-top: 2em;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 95%;
+            margin-top: 0;
+            position: relative;
         }
         .player-name {
             font-size: 1.2em;
             font-weight: bold;
-            width: 15%;
+            padding: 10px;
             text-align: center;
+            position: fixed;
+            background-color: #f9f9f9;
+            z-index: 1;
         }
         .movie-stack {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 60%;
+            margin: 0 auto;
+            margin-top: 20px;
         }
         .movie-box {
             border: 1px solid #ccc;
             padding: 1em;
             margin: 0.5em 0;
-            width: 100%;
+            width: 90%;
             background-color: #f1f1f1;
             border-radius: 8px;
             font-size: 0.9em;
         }
-
+        .player1-name {
+            top: 200px;
+            left: 75px;
+        }
+        .player2-name {
+            top: 200px;
+            right: 75px;
+        }
+        .player1-progress {
+            top: 250px;
+            left: 75px;
+        }
+        .player2-progress {
+            top: 250px;
+            right: 75px;
+        }
     </style>
 
     <script>
@@ -110,6 +143,9 @@
                     document.getElementById("player1Box").textContent = data.player1.userName;
                     document.getElementById("player2Box").textContent = data.player2.userName;
 
+                    //set player progress towards win
+                    document.getElementById("player1ProgressTowardsWin").textContent = data.player1.progressTowardWin;
+                    document.getElementById("player2ProgressTowardsWin").textContent = data.player2.progressTowardWin;
 
                     //document.getElementById("winConditionDisplay").textContent = data.winCondition;  //TODO update after winCondition is moved to win class
                     const winConditionMap = {
@@ -197,7 +233,7 @@
         <!-- Right Side: Player Name -->
         <div class="section">
             <h2>Enter the name of Player #1:</h2>
-            <input type="text" id="player1Name" placeholder="Player 1 Name" />
+            <input type="text" id="player1Name" placeholder="Player 1 Name" />  <!-- Sam -->
             <h2>Enter the name of Player #2:</h2>
             <input type="text" id="player2Name" placeholder="Player 2 Name" />
 
@@ -231,8 +267,10 @@
         </div>
     </div>
 
+    <div class="game-scrollable">
     <div class="game-middle">
-        <div class="player-name" id="player1Box">Player 1</div>
+        <div class="player-name player1-name" id="player1Box">Player 1</div>
+        <div class="player-name player1-progress" id="player1ProgressTowardsWin">##</div>
         <div class="movie-stack">
             <!-- This can be generated dynamically with JS -->
             <div class="movie-box" id="movieDisplay">
@@ -241,12 +279,34 @@
                 <strong>Genre:</strong> <span id="genreList">...</span><br>
                 <strong>Link to previous:</strong> <span id="linkToPrevious">n/a</span>
             </div>
-            <div class="movie-box">Empty</div>
-            <div class="movie-box">Empty</div>
-            <div class="movie-box">Empty</div>
-            <div class="movie-box">Empty</div>
+            <div class="movie-box" id="movieDisplay2">
+                <strong>Title:</strong> <span id="movieTitle2">n/a</span><br>
+                <strong>Release Year:</strong> <span id="releaseYear2">n/a</span><br>
+                <strong>Genre:</strong> <span id="genreList2">n/a</span><br>
+                <strong>Link to previous:</strong> <span id="linkToPrevious2">n/a</span>
+            </div>
+            <div class="movie-box" id="movieDisplay3">
+                <strong>Title:</strong> <span id="movieTitle3">n/a</span><br>
+                <strong>Release Year:</strong> <span id="releaseYear3">n/a</span><br>
+                <strong>Genre:</strong> <span id="genreList3">n/a</span><br>
+                <strong>Link to previous:</strong> <span id="linkToPrevious3">n/a</span>
+            </div>
+            <div class="movie-box" id="movieDisplay4">
+                <strong>Title:</strong> <span id="movieTitle4">n/a</span><br>
+                <strong>Release Year:</strong> <span id="releaseYear4">n/a</span><br>
+                <strong>Genre:</strong> <span id="genreList4">n/a</span><br>
+                <strong>Link to previous:</strong> <span id="linkToPrevious4">n/a</span>
+            </div>
+            <div class="movie-box" id="movieDisplay5">
+                <strong>Title:</strong> <span id="movieTitle5">n/a</span><br>
+                <strong>Release Year:</strong> <span id="releaseYear5">n/a</span><br>
+                <strong>Genre:</strong> <span id="genreList5">n/a</span><br>
+                <strong>Link to previous:</strong> <span id="linkToPrevious5">n/a</span>
+            </div>
         </div>
-        <div class="player-name" id="player2Box">Player 2</div>
+        <div class="player-name player2-name" id="player2Box">Player 2</div>
+        <div class="player-name player2-progress" id="player2ProgressTowardsWin">##</div>
+    </div>
     </div>
 </div>
 

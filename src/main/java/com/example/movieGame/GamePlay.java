@@ -51,16 +51,17 @@ public class GamePlay
         //TODO (call class here)
 
         //randomly select movie
-        //TODO REMOVE - for UI testing only
-        HashSet<String> genre = new HashSet<>(Arrays.asList("Horror", "Drama", "Action"));
+        //TODO REMOVE later - for UI testing only
+        /*HashSet<String> genre = new HashSet<>(Arrays.asList("Horror", "Drama", "Action"));
         HashSet<String> actors = new HashSet<>();
         HashSet<String> directors = new HashSet<>();
         HashSet<String> writers = new HashSet<>();
         HashSet<String> cinematographers = new HashSet<>();
         HashSet<String> composers = new HashSet<>();
-        firstMovie = new Movie("Jaws",24913, 1909L,genre,actors,directors,writers,cinematographers,composers);
+        firstMovie = new Movie("Jaws",24913, 1909L,genre,actors,directors,writers,cinematographers,composers);*/
+
         //TODO (keep the below line, uncomment it after done with UI testing)
-        //firstMovie = randomMovieSelection();
+        firstMovie = randomMovieSelection();
     }
 
     /**
@@ -68,7 +69,7 @@ public class GamePlay
      *
      */
     public Movie randomMovieSelection() {
-/*
+
         try {
             // Check if data is loaded; if not, load it
 
@@ -128,8 +129,7 @@ public class GamePlay
             System.err.println("Error selecting random movie: " + e.getMessage());
             e.printStackTrace();
             return null;
-        }*/
-        return null;
+        }
     }
 
     //Checks whether the movie entered has a valid linkage

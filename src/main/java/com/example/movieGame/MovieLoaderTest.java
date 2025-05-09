@@ -9,7 +9,7 @@ import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
 
 public class MovieLoaderTest {
-/*
+
 
     // TODO - Properly test the remaining arrays
     @Test
@@ -44,5 +44,5 @@ public class MovieLoaderTest {
 
 
     }
-*/
+
 }
