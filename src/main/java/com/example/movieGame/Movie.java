@@ -38,6 +38,8 @@ public class Movie {
     }
 
 
+
+
     public String getMovieTitle() {
         return movieTitle;
     }
@@ -76,5 +78,10 @@ public class Movie {
 
     public ArrayList<SingleConnection> getLinksToPreviousMovie() {
         return linksToPreviousMovie;
+    }
+
+    @Override
+    public String toString() {
+        return this.movieTitle;
     }
 }

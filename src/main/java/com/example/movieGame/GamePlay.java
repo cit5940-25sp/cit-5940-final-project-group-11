@@ -5,7 +5,7 @@ import java.util.*;
 
 public class GamePlay
 {
-    private ArrayList<Integer> moviesUsed; //list of movie IDs ot track if it's been used before
+    ArrayList<Integer> moviesUsed; //list of movie IDs ot track if it's been used before
 
     private int actorConnectionUsage; //# of times an actor connection has been made;
     private int directorConnectionUsage; //# of times a director connection has been made;
@@ -13,9 +13,20 @@ public class GamePlay
     private int cinematographerConnectionUsage; //# of times a cinematographer connection has been made;
     private int composerConnectionUsage; //# of times a composer connection has been made;
 
+    private Map<String, Integer> actorUsage = new HashMap<>();      // Maps actor name to usage count
+    private Map<String, Integer> directorUsage = new HashMap<>();   // Maps director name to usage count
+    private Map<String, Integer> writerUsage = new HashMap<>();     // Maps writer name to usage count
+    private Map<String, Integer> cinematographerUsage = new HashMap<>(); // Maps cinematographer to usage count
+    private Map<String, Integer> composerUsage = new HashMap<>();   // Maps composer name to usage count
+
     private int numberOfRounds; //tracks # of rounds played (for display)
-    private Queue<Movie> lastFiveMovies; //LinkedList of movie objects showing last 5 (FIFO)
-    private Movie firstMovie; //first randomly selected movie
+    Queue<Movie> lastFiveMovies; //LinkedList of movie objects showing last 5 (FIFO)
+    Movie firstMovie; //first randomly selected movie
+
+    private Timer gameTimer;
+    private boolean timerActive;
+    private final int maxTimePerTurn = 30;
+    private int timeRemaining;
 
     private Player player1;
     private Player player2;
@@ -123,12 +134,24 @@ public class GamePlay
     }
 
     /**
+     *
      * tracks time for each player
      *
      */
-    public void thirtySecondTimer() {
+    public void thirtySecondTimerStart() {
         //TODO
         //not sure what it should return/ how this would work
+
+        if (gameTimer != null) {
+            gameTimer.cancel();
+        }
+
+        gameTimer = new Timer();
+        timerActive = true;
+        timeRemaining = maxTimePerTurn;
+
+
+
     }
 
     /**
@@ -144,8 +167,47 @@ public class GamePlay
 
         //check for duplicate movie (return error if issue)
         if (moviesUsed.contains(movie.getMovieID())) {
-            return "Error: main.java.com.example.movieGame.Movie already used.";
+            return "Error:Movie already used.";
         }
+
+        boolean validConnection = false;
+        List<SingleConnection> connections = new ArrayList<>();
+
+        Movie previousMovie = null;
+        if (!lastFiveMovies.isEmpty()) {
+            previousMovie = ((LinkedList<Movie>) lastFiveMovies).getLast();
+        } else if (firstMovie != null) {
+            previousMovie = firstMovie;
+        } else {
+            moviesUsed.add(movie.getMovieID());
+            lastFiveMovies.add(movie);
+            numberOfRounds ++;
+
+        }
+
+
+        assert previousMovie != null;
+        for (String actor : previousMovie.getActors()) {
+            if (movie.getActors().contains(actor)){
+                if (actorConnectionUsage >=3) {
+                    return "Error: Actor connection used too many times.";
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         //check for 3+ connections (return error message if issue)
         if (actorConnectionUsage > 3) { //TODO - check - >3 or >=3?
@@ -184,6 +246,106 @@ public class GamePlay
         }
 
         return "Valid User Entry";
+    }
+
+    public MoveResult validateMove(Movie movie) {
+
+        if (moviesUsed.contains(movie.getMovieID())) {
+            return MoveResult.failure("Movie already used");
+        }
+
+        Movie previousMovie = null;
+
+
+
+        if (!lastFiveMovies.isEmpty()) {
+            previousMovie = ((LinkedList<Movie>) lastFiveMovies).getLast();
+        } else if (firstMovie != null) {
+            previousMovie = firstMovie;
+        } else {
+            return MoveResult.failure("no previous movie to connect to");
+
+        }
+
+        SingleConnection validConnection = null;
+        for (String actor : previousMovie.getActors()) {
+            if (movie.getActors().contains(actor)) {
+                int usage = actorUsage.getOrDefault(actor,0);
+                if (usage < 3) {
+                    validConnection = new SingleConnection("Actor", actor);
+                    break;
+                }
+            }
+        }
+        if (validConnection == null) {
+            // Check directors only if we haven't found a valid connection yet
+            for (String director : previousMovie.getDirectors()) {
+                if (movie.getDirectors().contains(director)) {
+                    int usage = directorUsage.getOrDefault(director, 0);
+                    if (usage < 3) {
+                        validConnection = new SingleConnection("Director", director);
+                        break; // Found a valid connection, no need to check more directors
+                    }
+                }
+            }
+        }
+
+        // Still no valid connection? Check writers
+        if (validConnection == null) {
+            for (String writer : previousMovie.getWriters()) {
+                if (movie.getWriters().contains(writer)) {
+                    int usage = writerUsage.getOrDefault(writer, 0);
+                    if (usage < 3) {
+                        validConnection = new SingleConnection("Writer", writer);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Still no valid connection? Check cinematographers
+        if (validConnection == null) {
+            for (String cinematographer : previousMovie.getCinematographers()) {
+                if (movie.getCinematographers().contains(cinematographer)) {
+                    int usage = cinematographerUsage.getOrDefault(cinematographer, 0);
+                    if (usage < 3) {
+                        validConnection = new SingleConnection("Cinematographer", cinematographer);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Still no valid connection? Check composers
+        if (validConnection == null) {
+            for (String composer : previousMovie.getComposers()) {
+                if (movie.getComposers().contains(composer)) {
+                    int usage = composerUsage.getOrDefault(composer, 0);
+                    if (usage < 3) {
+                        validConnection = new SingleConnection("Composer", composer);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // If we didn't find any valid connection
+        if (validConnection == null) {
+            return MoveResult.failure("No valid connection found between movies");
+        }
+
+        // We found a valid connection
+        List<SingleConnection> connections = new ArrayList<>();
+        connections.add(validConnection);
+        return MoveResult.success(connections);
+
+
+
+    }
+
+    public void setActorUsage(String name, int freq) {
+
+        actorUsage.put(name,freq);
     }
 
 
