@@ -271,7 +271,18 @@ public class GamePlay
      *
      */
 
-    //TODO need getters
+
+
+    //TODO need getters/setters
+
+    public Player getPlayer1() {
+        return player1;
+    }
+
+    public Player getPlayer2() {
+        return player2;
+    }
+
 }
 
 

@@ -39,6 +39,54 @@
             bottom: 20px;
             right: 20px;
         }
+        .game-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            padding: 1em;
+        }
+        .game-info-left, .game-info-right {
+            text-align: left;
+        }
+        .movie-input {
+            flex-grow: 1;
+            text-align: center;
+        }
+        .movie-input input {
+            width: 60%;
+            padding: 0.5em;
+            font-size: 1em;
+        }
+        .game-middle {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 90%;
+            margin-top: 2em;
+        }
+        .player-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            width: 15%;
+            text-align: center;
+        }
+        .movie-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 60%;
+        }
+        .movie-box {
+            border: 1px solid #ccc;
+            padding: 1em;
+            margin: 0.5em 0;
+            width: 100%;
+            background-color: #f1f1f1;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+
     </style>
 
     <script>
@@ -49,6 +97,16 @@
                 document.getElementById(screenId).classList.remove('visible');
             });
             document.getElementById(id).classList.add('visible');
+        }
+
+        function loadGameData() {
+            fetch('/gamestate')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("activePlayer").textContent = data.activePlayerName;
+                    document.getElementById("winConditionDisplay").textContent = data.winCondition;
+                    document.getElementById("roundCount").textContent = data.roundCount;
+                });
         }
 
         function selectWinCondition(value) {
@@ -74,6 +132,7 @@
                 .then(response => {
                     if (response.ok) {
                         showScreen('gameScreen');
+                        loadGameData();
                     } else {
                         alert("There was an error. Please try again.");
                     }
@@ -121,10 +180,40 @@
     </div>
 </div>
 
+
+
 <!-- Game Screen -->
 <div id="gameScreen" class="screen">
-    <h2>Game Screen (Coming Soon)</h2>
+    <div class="game-top-bar">
+        <div class="game-info-left">
+            <p><b>Active Player:</b> <span id="activePlayer">Loading...</span></p>
+            <!--<p><b>Active Player:</b> <span id="activePlayer" th:text="${activePlayer}">player1</span></p> -->
+            <!--  <p><b>Active Player:</b> <span id="activePlayer">player1</span></p>  -->
+            <p><b>Win Condition:</b> <span id="winConditionDisplay">[Win Condition]</span></p>
+            <p><b>Rounds Played:</b> <span id="roundCount">0</span></p>
+        </div>
+        <div class="movie-input">
+            <input type="text" id="movieInput" placeholder="Enter a movie..." />
+        </div>
+        <div class="game-info-right">
+            <p><b>Time Left:</b> <span id="timer">30</span>s</p>
+        </div>
+    </div>
+
+    <div class="game-middle">
+        <div class="player-name" id="player1Box">Player 1</div>
+        <div class="movie-stack">
+            <!-- This can be generated dynamically with JS -->
+            <div class="movie-box">Title: ...<br>Release Year: ...<br>Genre: ...<br>Link to previous: ...</div>
+            <div class="movie-box">Empty</div>
+            <div class="movie-box">Empty</div>
+            <div class="movie-box">Empty</div>
+            <div class="movie-box">Empty</div>
+        </div>
+        <div class="player-name" id="player2Box">Player 2</div>
+    </div>
 </div>
+
 
 </body>
 </html>
