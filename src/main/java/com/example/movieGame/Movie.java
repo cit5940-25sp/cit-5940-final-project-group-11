@@ -1,6 +1,7 @@
 package com.example.movieGame;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -74,7 +75,7 @@ public class Movie {
         return genre;
     }
 
-     public ArrayList<SingleConnection> getLinksToPreviousMovie() {
+    public ArrayList<SingleConnection> getLinksToPreviousMovie() {
         return linksToPreviousMovie;
     }
 }

@@ -34,20 +34,38 @@ public class ControllerClass {
         }
 
         GamePlay gamePlay = new GamePlay(player1, player2);
+        gamePlay.setWinCondition(winCondition);
         session.setAttribute("gamePlay", gamePlay); // Store game in session
 
         return "redirect:/game"; // Redirect to the game view
     }
 
+    @PostMapping("/timeUp")
+    @ResponseBody
+    public ResponseEntity<String> handleTimeUp(HttpSession session) {
+        GamePlay gamePlay = (GamePlay) session.getAttribute("gamePlay");
+        if (gamePlay == null) {
+            return ResponseEntity.badRequest().body("No active game");
+        }
+
+        // You can modify the logic here: TODO: update this to add logic for what to do when timer runs out
+        //gamePlay.incrementRound();  // assuming such a method exists
+        //gamePlay.switchPlayer();    // assuming you track active player
+
+        return ResponseEntity.ok("Time processed");
+    }
+
+
     @GetMapping("/gamestate")
     @ResponseBody
-    public GamePlay getGameState() {
-        return gamePlay;
+    public GamePlay getGameState(HttpSession session) {
+        GamePlay gamePlay = (GamePlay) session.getAttribute("gamePlay");
+        return gamePlay;  // assuming GamePlay has getters for player1/player2
     }
     @GetMapping("/game")
     public String showGameScreen(Model model) {
         //update active player
-        if (gamePlay.getPlayer1().getIsActive()) {
+        /*if (gamePlay.getPlayer1().getIsActive()) {
             //pass attribute back to view
             model.addAttribute("activePlayer", gamePlay.getPlayer1().getUserName());
             //update active status
@@ -57,7 +75,7 @@ public class ControllerClass {
             //update active status
             gamePlay.getPlayer2().setIsActive(false);
             gamePlay.getPlayer1().setIsActive(true);
-        }
+        }*/
         //update win conditoin
         //TODO
         //model.addAttribute("winCondition", gamePlay.getWinCondition());

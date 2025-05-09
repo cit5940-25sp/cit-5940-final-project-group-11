@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class MovieLoader {
-
+/*
 
     private static List<Movie> movies;
     private static HashSet<Integer> idSet;
@@ -213,7 +213,7 @@ public class MovieLoader {
 
     }
 
-
+*/
 }
 
 

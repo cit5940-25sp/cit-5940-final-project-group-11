@@ -16,6 +16,7 @@ public class GamePlay
     private int numberOfRounds; //tracks # of rounds played (for display)
     private Queue<Movie> lastFiveMovies; //LinkedList of movie objects showing last 5 (FIFO)
     private Movie firstMovie; //first randomly selected movie
+    private String winCondition; //TODO move this to Win class once it's set up
 
     private Player player1;
     private Player player2;
@@ -33,13 +34,11 @@ public class GamePlay
         moviesUsed = new ArrayList<>();
         Map<String, Integer> connectionsUsageMap;
 
-
         actorConnectionUsage = 0;
         directorConnectionUsage = 0;
         writerConnectionUsage = 0;
         cinematographerConnectionUsage = 0;
         composerConnectionUsage = 0;
-
 
         numberOfRounds = 0;
         lastFiveMovies = new LinkedList<>();
@@ -48,13 +47,20 @@ public class GamePlay
         player1 = new Player(player1Name, true);
         player2 = new Player(player2Name, false);
 
-
-
         //set up data file
         //TODO (call class here)
 
         //randomly select movie
-        firstMovie = randomMovieSelection();
+        //TODO REMOVE - for UI testing only
+        HashSet<String> genre = new HashSet<>(Arrays.asList("Horror", "Drama", "Action"));
+        HashSet<String> actors = new HashSet<>();
+        HashSet<String> directors = new HashSet<>();
+        HashSet<String> writers = new HashSet<>();
+        HashSet<String> cinematographers = new HashSet<>();
+        HashSet<String> composers = new HashSet<>();
+        firstMovie = new Movie("Jaws",24913, 1909L,genre,actors,directors,writers,cinematographers,composers);
+        //TODO (keep the below line, uncomment it after done with UI testing)
+        //firstMovie = randomMovieSelection();
     }
 
     /**
@@ -62,7 +68,7 @@ public class GamePlay
      *
      */
     public Movie randomMovieSelection() {
-
+/*
         try {
             // Check if data is loaded; if not, load it
 
@@ -122,7 +128,8 @@ public class GamePlay
             System.err.println("Error selecting random movie: " + e.getMessage());
             e.printStackTrace();
             return null;
-        }
+        }*/
+        return null;
     }
 
     //Checks whether the movie entered has a valid linkage
@@ -278,11 +285,30 @@ public class GamePlay
     public Player getPlayer1() {
         return player1;
     }
-
     public Player getPlayer2() {
         return player2;
     }
-
+    public String getActivePlayerName() {
+        if (player1.getIsActive()) {
+            return player1.getUserName();
+        } else {
+            return player2.getUserName();
+        }
+    }
+    public int getNumberOfRounds() {
+        return numberOfRounds;
+    }
+    public Movie getFirstMovie() {
+        return firstMovie;
+    }
+    //TODO move this to win class once created and update UI accordingly
+    public String getWinCondition() {
+        return winCondition;
+    }
+    //TODO move this to win class once created and update UI accordingly
+    public void setWinCondition(String winCondition) {
+        this.winCondition = winCondition;
+    }
 }
 
 
