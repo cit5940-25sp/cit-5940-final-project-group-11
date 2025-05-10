@@ -58,6 +58,7 @@
         .movie-input {
             flex-grow: 1;
             text-align: center;
+            position: relative;
         }
         .movie-input input {
             width: 60%;
@@ -119,6 +120,11 @@
         .player2-progress {
             top: 250px;
             right: 75px;
+        }
+        #autocomplete-list div {
+            text-align: left;
+            padding: 8px;
+            cursor: pointer;
         }
     </style>
 
@@ -261,6 +267,17 @@
         </div>
         <div class="movie-input">
             <input type="text" id="movieInput" placeholder="Enter a movie..." />
+            <div id="autocomplete-list" style="
+                position: absolute;
+                top: 100%;               /* place it directly under the input field */
+                left: 20%;
+                width: 60%;              /* match the input width */
+                background: white;
+                border: 1px solid #ccc;
+                z-index: 1000;
+                max-height: 200px;
+                overflow-y: auto;
+            "></div>
         </div>
         <div class="game-info-right">
             <p><b>Time Left:</b> <span id="timer">30</span>s</p>
@@ -386,7 +403,9 @@
 
     document.addEventListener("DOMContentLoaded", () => {
         const inputField = document.getElementById("movieInput");
+        const suggestionBox = document.getElementById("autocomplete-list");
 
+        // Handle Enter key to submit movie
         inputField.addEventListener("keydown", function (event) {
             if (event.key === "Enter") {
                 event.preventDefault(); // prevent form submission if in a form
@@ -395,7 +414,6 @@
                 if (currentMovieInput) {
                     console.log("User submitted movie:", currentMovieInput);
 
-                    // Example: you could send to backend here
                     fetch("/submitMovie", {
                         method: "POST",
                         headers: {
@@ -405,7 +423,7 @@
                     }).then(response => {
                         if (response.ok) {
                             inputField.value = ""; // clear input after submission
-                            // Possibly refresh game data or update UI
+                            suggestionBox.innerHTML = ""; // clear suggestions too
                         } else {
                             alert("There was an error submitting your movie.");
                         }
@@ -413,8 +431,42 @@
                 }
             }
         });
+
+        // Handle typing for autocomplete
+        inputField.addEventListener("input", function () {
+            const query = inputField.value.trim();
+            if (!query) {
+                suggestionBox.innerHTML = "";
+                return;
+            }
+
+            fetch(`/autocomplete?query=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(suggestions => {
+                    suggestionBox.innerHTML = "";
+                    suggestions.forEach(suggestion => {
+                        const div = document.createElement("div");
+                        div.textContent = suggestion;
+                        div.style.padding = "8px";
+                        div.style.cursor = "pointer";
+                        div.addEventListener("click", () => {
+                            inputField.value = suggestion;
+                            suggestionBox.innerHTML = "";
+                        });
+                        suggestionBox.appendChild(div);
+                    });
+                });
+        });
+
+        // Optional: hide suggestions when clicking outside
+        document.addEventListener("click", function (e) {
+            if (e.target !== inputField) {
+                suggestionBox.innerHTML = "";
+            }
+        });
     });
 </script>
+
 
 
 

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 //TODO delete this line - update just for the sake of github updating
@@ -123,6 +124,22 @@ public class ControllerClass {
         return "OK";
     }
 
+
+    @GetMapping("/autocomplete")
+    @ResponseBody
+    public List<String> autocomplete(@RequestParam("query") String query, HttpSession session) {
+        GamePlay gamePlay = (GamePlay) session.getAttribute("gamePlay");
+        if (gamePlay == null) return List.of();
+
+        Autocomplete autocomplete = gamePlay.getAutocomplete(); // adjust as needed
+        List<ITerm> suggestions = autocomplete.getSuggestions(query);
+
+        int k = 8;
+        return suggestions.stream()
+                .limit(k)
+                .map(ITerm::getTerm) // or getQuery(), etc.
+                .toList();
+    }
 
 
 
