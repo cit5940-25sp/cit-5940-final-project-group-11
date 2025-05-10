@@ -129,7 +129,8 @@
     </style>
 
     <script>
-        let selectedWinCondition = "";
+        //let selectedWinCondition = "";
+        let winCondition = "";
 
         function showScreen(id) {
             ['initialScreen', 'setupScreen', 'gameScreen'].forEach(screenId => {
@@ -153,6 +154,9 @@
                     document.getElementById("player1ProgressTowardsWin").textContent = data.player1.progressTowardWin;
                     document.getElementById("player2ProgressTowardsWin").textContent = data.player2.progressTowardWin;
 
+                    //TODO i think this would be where you'd also update each of the 5 boxes? potentially?
+
+                    /*
                     //document.getElementById("winConditionDisplay").textContent = data.winCondition;  //TODO update after winCondition is moved to win class
                     const winConditionMap = {
                         horror: "4 Horror Movies",
@@ -163,7 +167,9 @@
                     };
                     const readableWinCondition = winConditionMap[data.winCondition] || data.winCondition;
                     document.getElementById("winConditionDisplay").textContent = readableWinCondition;
-
+                    */
+                    const genre = data.winCondition;
+                    document.getElementById("winConditionDisplay").textContent = `Name 5 ${genre} Movies`;
 
                     //Set first movie
                     const movie = data.firstMovie;
@@ -182,17 +188,20 @@
                 });
         }
 
-        function selectWinCondition(value) {
+        //Note this is not currently being used
+        /*function selectWinCondition(value) {
             selectedWinCondition = value;
             document.querySelectorAll('.win-button').forEach(btn => btn.style.backgroundColor = '');
             document.getElementById("win-" + value).style.backgroundColor = '#d1e7dd';
         }
+        */
 
         function submitSetup() {
             const player1 = document.getElementById("player1Name").value;  //this stores the name the user types in Player#1 input field
             const player2 = document.getElementById("player2Name").value;
+            const winCondition = document.getElementById("winCondition").value;
 
-            if (!player1 || !player2 || !selectedWinCondition) {
+            if (!player1 || !player2 || !winCondition) {
                 alert("Please enter both names and select a win condition.");
                 return;
             }
@@ -200,7 +209,7 @@
             fetch("/setup", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: `player1=${encodeURIComponent(player1)}&player2=${encodeURIComponent(player2)}&winCondition=${encodeURIComponent(selectedWinCondition)}`
+                body: `player1=${encodeURIComponent(player1)}&player2=${encodeURIComponent(player2)}&winCondition=${encodeURIComponent(winCondition)}`
             })
                 .then(response => {
                     if (response.ok) {
@@ -226,14 +235,24 @@
 <div id="setupScreen" class="screen">
     <div class="setup-container">
         <!-- Left Side: Win Conditions -->
+        <!-- Win Conditions adjusted to be single value options for genre only -->
         <div class="section">
-            <h2>Select the win condition:</h2>
+            <h2>Select the win condition genre:</h2>
+            <select id = "winCondition">
+                <option value = "Horror"> Horror </option>
+                <option value = "Comedy"> Comedy </option>
+                <option value = "Action"> Action </option>
+                <option value = "Drama"> Drama </option>
+                <option value = "Science Fiction"> Science Fiction </option>
+            </select>
+            <!--
             <button id="win-horror" class="win-button" onclick="selectWinCondition('horror')">Name four horror movies</button><br>
             <button id="win-comedy" class="win-button" onclick="selectWinCondition('comedy')">Name four comedies</button><br>
             <button id="win-action" class="win-button" onclick="selectWinCondition('action')">Name four action movies</button><br>
             <button id="win-sciFi" class="win-button" onclick="selectWinCondition('sciFi')">Name four science fiction movies</button>
             <br>
             <button id="win-drama" class="win-button" onclick="selectWinCondition('drama')">Name four dramas</button>
+            -->
         </div>
 
         <!-- Right Side: Player Name -->
@@ -483,15 +502,30 @@
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
                 body: `movieId=${encodeURIComponent(movieId)}`
-            }).then(response => {
-                if (response.ok) {
-                    document.getElementById("movieInput").value = "";
-                    document.getElementById("autocomplete-list").innerHTML = "";
-                } else {
-                    alert("There was an error submitting your movie.");
-                }
-            });
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.resultScreen) {
+                        // Show result screen with game over info
+                        document.getElementById("winnerName").textContent = data.winner;
+                        document.getElementById("loserName").textContent = data.loser;
+                        document.getElementById("loseReason").textContent = data.reason;
+                        showScreen("resultScreen");
+                    } else if (data.message === "Valid connection") {
+                        console.log("ARGH");  // Just log to terminal
+                        document.getElementById("movieInput").value = "";
+                        document.getElementById("autocomplete-list").innerHTML = "";
+                        loadGameData();  // Refresh game state
+                        startTimer();  //restart timer
+                    } else if (data.error) {
+                        alert("Error: " + data.error);
+                    } else {
+                        console.warn("Unexpected response:", data);
+                    }
+                });
         }
+
+
 
     });
 </script>
