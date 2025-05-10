@@ -116,6 +116,10 @@ public class ControllerClass {
     }*/
 
 
+
+
+    // add another request param for disambiguation (year?)
+    // map < str title, movie> title -> title + movie.year
     @PostMapping("/submitMovie")
     @ResponseBody
     public Map<String, Object> handleMovieSubmission(@RequestParam("movieId") int movieId, HttpSession session) {

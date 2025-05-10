@@ -32,9 +32,9 @@ public class GamePlay
     //Movie firstMovie; //first randomly selected movie
 
     private Timer gameTimer;
-    private boolean timerActive;
+
     private final int maxTimePerTurn = 30;
-    private int timeRemaining;
+
 
     Queue<Movie> lastFiveMovies; //LinkedList of movie objects showing last 5 (FIFO)
     private Movie firstMovie; //first randomly selected movie
@@ -45,7 +45,7 @@ public class GamePlay
 
     private Player player1;
     private Player player2;
-    private String player1Name;
+
 
     private Autocomplete autocomplete;
 
@@ -229,9 +229,15 @@ public class GamePlay
     }
 
 
+    public Movie getMovieFromTitle(String title) {
+        title = title.strip().toLowerCase();
 
-    /**
-     * updates game state and variables based on user entry
+        return moviesByTitle.get(title);
+    }
+
+
+
+     /* updates game state and variables based on user entry
      *
      * @return error message citing reason for the error
      * @parameter
@@ -297,10 +303,22 @@ public class GamePlay
         }
 
         // Switch active player
-        player1.setIsActive(!player1.getIsActive());
-        player2.setIsActive(!player2.getIsActive());
+        switchActivePlayer();
 
         return "Valid User Entry";
+    }
+
+    public Player getActivePlayer() {
+        if (player1.getIsActive()) {
+            return player1;
+        } else {
+            return player2;
+        }
+    }
+
+    public void switchActivePlayer() {
+        player1.setIsActive(!player1.getIsActive());
+        player2.setIsActive(!player2.getIsActive());
     }
 
 
@@ -414,12 +432,15 @@ public class GamePlay
         return player2;
     }
     public String getActivePlayerName() {
-        if (player1.getIsActive()) {
+        /*if (player1.getIsActive()) {
             return player1.getUserName();
         } else {
             return player2.getUserName();
-        }
+        }*/
+        return getActivePlayer().getUserName();
     }
+
+
     public int getNumberOfRounds() {
         return numberOfRounds;
     }
@@ -438,6 +459,8 @@ public class GamePlay
     public void setWinCondition(String winCondition) {
         this.winCondition = winCondition;
     }
+
+
 }
 
 
