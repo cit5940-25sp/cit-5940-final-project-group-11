@@ -22,6 +22,8 @@ public class GamePlay
     private Player player2;
     private String player1Name;
 
+    private Autocomplete autocomplete;
+
     private ArrayList<SingleConnection> linksToPreviousMovie;  //list of connections to previous movie
 
     /**
@@ -62,6 +64,10 @@ public class GamePlay
 
         //TODO (keep the below line, uncomment it after done with UI testing)
         firstMovie = randomMovieSelection();
+
+        //build trie to be used in the autocomplete
+        autocomplete = new Autocomplete();
+        autocomplete.buildTrie("autocompleteTesting.txt",8); //TODO update this filename to be csv after done testing
     }
 
     /**
@@ -301,6 +307,10 @@ public class GamePlay
     public Movie getFirstMovie() {
         return firstMovie;
     }
+    public Autocomplete getAutocomplete() {
+        return autocomplete;
+    }
+
     //TODO move this to win class once created and update UI accordingly
     public String getWinCondition() {
         return winCondition;
