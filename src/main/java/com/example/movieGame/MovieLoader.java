@@ -11,6 +11,7 @@ public class MovieLoader {
 
 
     private static List<Movie> movies;
+    private static HashMap<Integer, Movie> moviesHashMap;
     private static HashSet<Integer> idSet;
     private static Map<Integer, List<String>> actorMap;
     private static Map<Integer, List<String>> directorMap;
@@ -189,6 +190,7 @@ public class MovieLoader {
 
         //Initialise movies
         movies = new ArrayList<>();
+        moviesHashMap = new HashMap<>();
 
         //Create list actors, directors,  writers, cinematographers and composers
         //Convert to HashSet<String>
@@ -205,7 +207,7 @@ public class MovieLoader {
             //Create a movie object for each row
             Movie movie = new Movie(titleId, id, yearId, genres, actors, directors, writers, cinematographers, composers);
             movies.add(movie);
-
+            moviesHashMap.put(id, movie);  //hashmap for searching
         }
 
         //Return movie object
@@ -213,7 +215,9 @@ public class MovieLoader {
 
     }
 
-
+    public static HashMap<Integer, Movie> getMoviesHashMap() {
+        return moviesHashMap;
+    }
 }
 
 

@@ -21,7 +21,7 @@ public class Movie {
 
     private Long releaseYear;
     private HashSet<String> genre; //Updated to a set of genres
-    private ArrayList<SingleConnection> linksToPreviousMovie;  //list of connections to previous movie
+    ArrayList<SingleConnection> linksToPreviousMovie;  //list of connections to previous movie
     // TODO - might make more sense ot store somewhere else
 
     //Constructor to create the Movie object
@@ -37,6 +37,8 @@ public class Movie {
         this.cinematographers = cinematographers;
         this.composers = composers;
     }
+
+
 
 
     public String getMovieTitle() {
@@ -77,5 +79,10 @@ public class Movie {
 
     public ArrayList<SingleConnection> getLinksToPreviousMovie() {
         return linksToPreviousMovie;
+    }
+
+    @Override
+    public String toString() {
+        return this.movieTitle;
     }
 }

@@ -50,7 +50,7 @@ public class ControllerClass {
 
     @PostMapping("/endGame")
     @ResponseBody
-    public Map<String,String> handleEndGame(@RequestParam("reason") String reason, HttpSession session) {
+    public Map<String, String> handleEndGame(@RequestParam("reason") String reason, HttpSession session) {
         GamePlay gamePlay = (GamePlay) session.getAttribute("gamePlay");
         Map<String, String> result = new HashMap<>();
 
@@ -59,90 +59,150 @@ public class ControllerClass {
             return result;
         }
 
-        String winner = "Unknown", loser = "Unknown";
+        String winner = "Unknown";
+        String loser = "Unknown";
 
-        switch(reason) {
+        switch (reason) {
             case "time":
-                //set winner as activeplayer (ie the person who ran out of time)
                 loser = gamePlay.getActivePlayerName();
                 winner = gamePlay.getPlayer1().getUserName();
-                if (loser.equals(gamePlay.getPlayer1().getUserName())) {
+                if (loser.equals(winner)) {
                     winner = gamePlay.getPlayer2().getUserName();
                 }
                 break;
+/*
             case "winConditionMet":
-                //TODO update logic
-                //winner = gamePlay.getWinner().getUserName();  // You'd implement this logic
-                //loser = gamePlay.getLoser().getUserName();
+                winner = gamePlay.getActivePlayerName();
+                if (winner.equals(winner)) {
+                    loser = gamePlay.getPlayer2().getUserName();
+                }
                 break;
-            case "movieAlreadyUsed":
-                //TODO update logic
-                //player submits a duplicate movie
-                //winner = gamePlay.getInactivePlayer().getUserName();
-                //loser = gamePlay.getActivePlayer().getUserName();
-                break;
+
+            case "movie already used":
+            case "no valid connection":
+                // Active player made a mistake → they lose
+                loser = gamePlay.getActivePlayerName();
+                winner = gamePlay.getPlayer1().getUserName();
+                if (loser.equals(winner)) {
+                    winner = gamePlay.getPlayer2().getUserName();
+                }
+
             case "connectionUsedTooManyTimes":
-                //TODO update logic
-                //player uses the connection too many times
-                //winner = gamePlay.getInactivePlayer().getUserName();
-                //loser = gamePlay.getActivePlayer().getUserName();
+                loser = gamePlay.getActivePlayerName();
+                winner = gamePlay.getPlayer1().getUserName();
+                if (loser.equals(winner)) {
+                    winner = gamePlay.getPlayer2().getUserName();
+                }
                 break;
+*/
             default:
-                winner = "Unknown";
-                loser = "Unknown";
                 break;
         }
 
         result.put("winner", winner);
         result.put("loser", loser);
-        result.put("reason", mapReasonToText(reason));
+        result.put("reason", "Timer ran out");
+        //result.put("reason", mapReasonToText(reason));
 
         return result;
     }
-
+/*
     private String mapReasonToText(String reasonCode) {
-        switch (reasonCode) {
-            case "time": return "Timer ran out";
-            case "winConditionMet": return "Win condition met";
-            case "movieAlreadyUsed": return "Movie already used";
-            case "connectionUsedTooManyTimes": return "Connection used too many times";
-            default: return "Game ended";
-        }
-    }
+        return switch (reasonCode) {
+            case "time" -> "Timer ran out";
+            case "winConditionMet" -> "Win condition met!";
+            case "movie already used" -> "Movie already used";
+            case "no valid connection" -> "No valid connection to previous movie";
+            case "connectionUsedTooManyTimes" -> "Connection used too many times";
+            default -> "Game ended";
+        };
+    }*/
 
+
+
+
+    // add another request param for disambiguation (year?)
+    // map < str title, movie> title -> title + movie.year
     @PostMapping("/submitMovie")
     @ResponseBody
-    public String handleMovieSubmission(@RequestParam("movie") String movie, HttpSession session) {
+    public Map<String, Object> handleMovieSubmission(@RequestParam("movieId") int movieId, HttpSession session) {
         GamePlay gamePlay = (GamePlay) session.getAttribute("gamePlay");
+        Map<String, Object> response = new HashMap<>();
+
         if (gamePlay == null) {
-            return "No active game";
+            response.put("error", "No active game");
+            return response;
         }
 
-        //THIS COLLECTS THE MOVIE FROM THE USER'S ENTRY
-        //TODO use a setter method in GamePlay to update the movie
-        // need a way to take the string entered by the user and find the right movie object
+        Movie selectedMovie = gamePlay.findTermById(movieId);
+        String message = gamePlay.userEntry(selectedMovie);
 
-        // TODO: Logic to validate the movie, update game state, check win conditions, etc.
+        switch (message) {
+            case "Movie already used" -> {
+                response.put("resultScreen", true);
+                response.put("reason", "Movie already used");
+                findWinnerAndLoser(response, gamePlay);
+            }
+            case "No previous movie to connect to" -> {
+                response.put("resultScreen", true);
+                response.put("reason", "No previous movie to connect to");
+                findWinnerAndLoser(response, gamePlay);
+            }
+            case "No valid connection found between movies" -> {
+                response.put("resultScreen", true);
+                response.put("reason", "No valid connection found between movies");
+                findWinnerAndLoser(response, gamePlay);
+            }
+            case "Connection made too many times" -> {
+                response.put("resultScreen", true);
+                response.put("reason", "Connection made too many times");
+                findWinnerAndLoser(response, gamePlay);
+            }
+            case "Valid User Entry" -> {
+                //TODO - add actions here to update the screen
+                System.out.println("check");
+                response.put("resultScreen", false); // No need to show result screen
+                response.put("message", "Valid connection");
+            }
+            default -> {
+                response.put("error", "Unknown message");
+            }
+        }
 
-        return "OK";
+        return response;
     }
 
+    public void findWinnerAndLoser(Map<String, Object> response, GamePlay gamePlay) {
+        String active = gamePlay.getActivePlayerName();
+        if (active.equals(gamePlay.getPlayer1().getUserName())) {
+            response.put("winner", gamePlay.getPlayer2().getUserName());
+            response.put("loser", gamePlay.getPlayer1().getUserName());
+        } else {
+            response.put("winner", gamePlay.getPlayer1().getUserName());
+            response.put("loser", gamePlay.getPlayer2().getUserName());
+        }
+    }
 
     @GetMapping("/autocomplete")
     @ResponseBody
-    public List<String> autocomplete(@RequestParam("query") String query, HttpSession session) {
+    public List<Map<String, String>> autocomplete(@RequestParam("query") String query, HttpSession session) {
         GamePlay gamePlay = (GamePlay) session.getAttribute("gamePlay");
         if (gamePlay == null) return List.of();
 
-        Autocomplete autocomplete = gamePlay.getAutocomplete(); // adjust as needed
+        Autocomplete autocomplete = gamePlay.getAutocomplete();
         List<ITerm> suggestions = autocomplete.getSuggestions(query);
 
-        int k = 8;
         return suggestions.stream()
-                .limit(k)
-                .map(ITerm::getTerm) // or getQuery(), etc.
+                .limit(8)
+                .map(term -> {
+                    Map<String, String> map = new HashMap<>();
+                    map.put("id", String.valueOf(term.getWeight()));  // assuming ITerm has getId()
+                    map.put("term", term.getTerm());
+                    return map;
+                })
                 .toList();
     }
+
 
 
 

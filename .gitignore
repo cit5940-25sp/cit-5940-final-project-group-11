@@ -4,6 +4,10 @@
 # Log file
 *.log
 
+# ignore MacOS system fils 
+
+*.DS_Store
+
 # BlueJ files
 *.ctxt
 

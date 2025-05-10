@@ -154,6 +154,7 @@
                     document.getElementById("player1ProgressTowardsWin").textContent = data.player1.progressTowardWin;
                     document.getElementById("player2ProgressTowardsWin").textContent = data.player2.progressTowardWin;
 
+                    //TODO i think this would be where you'd also update each of the 5 boxes? potentially?
 
                     /*
                     //document.getElementById("winConditionDisplay").textContent = data.winCondition;  //TODO update after winCondition is moved to win class
@@ -293,7 +294,7 @@
                 background: white;
                 border: 1px solid #ccc;
                 z-index: 1000;
-                max-height: 200px;
+                max-height: 320px;
                 overflow-y: auto;
             "></div>
         </div>
@@ -436,6 +437,8 @@
                     return;
                 }
 
+                submitMovie(currentMovieInput);
+
                 if (currentMovieInput) {
                     console.log("User submitted movie:", currentMovieInput);
 
@@ -468,15 +471,17 @@
             fetch(`/autocomplete?query=${encodeURIComponent(query)}`)
                 .then(res => res.json())
                 .then(suggestions => {
+                    currentSuggestions = suggestions; // Save the full objects
                     suggestionBox.innerHTML = "";
                     suggestions.forEach(suggestion => {
                         const div = document.createElement("div");
-                        div.textContent = suggestion;
+                        div.textContent = suggestion.term;
                         div.style.padding = "8px";
                         div.style.cursor = "pointer";
                         div.addEventListener("click", () => {
-                            inputField.value = suggestion;
+                            inputField.value = suggestion.term;
                             suggestionBox.innerHTML = "";
+                            submitMovie(suggestion.id);  // Submit the unique ID, not the term
                         });
                         suggestionBox.appendChild(div);
                     });
@@ -489,6 +494,39 @@
                 suggestionBox.innerHTML = "";
             }
         });
+
+        function submitMovie(movieId) {
+            fetch("/submitMovie", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `movieId=${encodeURIComponent(movieId)}`
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.resultScreen) {
+                        // Show result screen with game over info
+                        document.getElementById("winnerName").textContent = data.winner;
+                        document.getElementById("loserName").textContent = data.loser;
+                        document.getElementById("loseReason").textContent = data.reason;
+                        showScreen("resultScreen");
+                    } else if (data.message === "Valid connection") {
+                        console.log("ARGH");  // Just log to terminal
+                        document.getElementById("movieInput").value = "";
+                        document.getElementById("autocomplete-list").innerHTML = "";
+                        loadGameData();  // Refresh game state
+                        startTimer();  //restart timer
+                    } else if (data.error) {
+                        alert("Error: " + data.error);
+                    } else {
+                        console.warn("Unexpected response:", data);
+                    }
+                });
+        }
+
+
+
     });
 </script>
 

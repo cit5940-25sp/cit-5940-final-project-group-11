@@ -41,10 +41,14 @@ public class Autocomplete implements IAutocomplete {
             rootNode = new Node();
         }
 
+
+        // comment this out because we actually need numbers, weird chars, etc
+
         //check for special character
         boolean specialChar = false;
         for (char chr : word.toCharArray()) {
-            if (Character.toLowerCase(chr) < 97 || Character.toLowerCase(chr) > 122) {
+            if (!(Character.toLowerCase(chr) < 256)) {
+            //if (Character.toLowerCase(chr) < 97 || Character.toLowerCase(chr) > 122) {
                 specialChar = true;
                 break;
             }
@@ -52,6 +56,9 @@ public class Autocomplete implements IAutocomplete {
         if (specialChar) {
             return;
         }
+
+        word = word.toLowerCase();
+
 
         int len = word.length(); //capture length of word
         int charCounter = 1; //track which character in the word it is
@@ -67,7 +74,7 @@ public class Autocomplete implements IAutocomplete {
         //loop through each letter in the word
         for (char chr : word.toCharArray()) {
             prefixWord = prefixWord + chr;  //track the prefix of the word to enter as a term
-            int alphabetPosition = chr - 97;    //capture index position (0 to 25) of character
+            int alphabetPosition = chr;    //capture index position (0 to 25) of character
             //CHECK IF NODE FOR THAT LETTER HAS DATA
             //if the node has a node in its references for that letter
             Node[] references;
@@ -122,7 +129,7 @@ public class Autocomplete implements IAutocomplete {
         //set prefix
         newNode.setPrefixes(1);
         //set references
-        newNode.setReferences(new Node[26]);
+        newNode.setReferences(new Node[255]);
         //place node in references array of currentNode
         currentNode.getReferences()[alphabetPosition] = newNode;
         //update currentNode to be the new Node just created
@@ -179,13 +186,13 @@ public class Autocomplete implements IAutocomplete {
         //move down the trie till you reach the node with the term that matches the prefix
         currentNode = rootNode;
         for (char chr : prefix.toCharArray()) {
-            if (chr < 97 || chr > 122) { //if a special character (ie not a letter)
+            if (!(chr < 256)) { //if a special character (ie not a letter)
                 return null;
             }
             if (currentNode == null) {
                 return null;
             }
-            currentNode = currentNode.getReferences()[chr - 97];
+            currentNode = currentNode.getReferences()[chr];
         }
         return currentNode;
     }
@@ -227,7 +234,18 @@ public class Autocomplete implements IAutocomplete {
         //loop through the rest of the trie past the prefix, and return a list of terms
         // (with word and weight)
         //traversal through all 26 elements of each node
-        trieTraversal(getSubTrie(prefix.toLowerCase()));
+        Node prefixNode = getSubTrie(prefix.toLowerCase());
+
+        // Check if the prefix itself is a word
+        if (prefixNode != null && prefixNode.getWords() > 0) {
+            String newTerm = prefixNode.getTerm().getTerm();
+            long newWeight = prefixNode.getTerm().getWeight();
+            Term validWord = new Term(String.valueOf(newTerm), newWeight);
+            suggestions.add(validWord);
+        }
+
+        // Then continue traversal of children
+        trieTraversal(prefixNode);
         return suggestions;
     }
 
@@ -267,8 +285,10 @@ public class Autocomplete implements IAutocomplete {
     public static void main(String[] args) {
         Autocomplete autocomplete = new Autocomplete();
         //autocomplete.addWord("test",2);
-        autocomplete.buildTrie("file4.txt",2);
-        autocomplete.getSuggestions("cla");
+        //autocomplete.buildTrie("file4.txt",2);
+        //autocomplete.getSuggestions("cla");
+
+
     }
 
 }
