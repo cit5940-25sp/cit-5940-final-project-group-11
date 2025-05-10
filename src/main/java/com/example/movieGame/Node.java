@@ -23,7 +23,7 @@ public class Node {
         term = new Term("",0);
         words = 0;
         prefixes = 0;
-        references = new Node[26];
+        references = new Node[255];
     }
 
     /**

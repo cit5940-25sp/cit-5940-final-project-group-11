@@ -123,7 +123,10 @@ public class GamePlay
 
             // create autocomplete trie
             autocomplete.addWord(movie.getMovieTitle().toLowerCase(), movie.getMovieID());
-
+            //TODO: note - tolowercase functionality here/in autocomplete means dropdown shows as all lowercase
+            // to show camelCase in teh dropdown, could change weight to be a string that records the camel case title
+            // and return that instead of the all lowercase version...actually that may not work...regardless,
+            // think we should should leave as-is and only come back to it later if we have time
 
 
 

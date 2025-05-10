@@ -275,7 +275,7 @@
                 background: white;
                 border: 1px solid #ccc;
                 z-index: 1000;
-                max-height: 200px;
+                max-height: 320px;
                 overflow-y: auto;
             "></div>
         </div>
@@ -418,6 +418,8 @@
                     return;
                 }
 
+                submitMovie(currentMovieInput);
+
                 if (currentMovieInput) {
                     console.log("User submitted movie:", currentMovieInput);
 
@@ -459,6 +461,7 @@
                         div.addEventListener("click", () => {
                             inputField.value = suggestion;
                             suggestionBox.innerHTML = "";
+                            submitMovie(suggestion);
                         });
                         suggestionBox.appendChild(div);
                     });
@@ -471,6 +474,24 @@
                 suggestionBox.innerHTML = "";
             }
         });
+
+        function submitMovie(movie) {
+            fetch("/submitMovie", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `movie=${encodeURIComponent(movie)}`
+            }).then(response => {
+                if (response.ok) {
+                    document.getElementById("movieInput").value = "";
+                    document.getElementById("autocomplete-list").innerHTML = "";
+                } else {
+                    alert("There was an error submitting your movie.");
+                }
+            });
+        }
+
     });
 </script>
 
