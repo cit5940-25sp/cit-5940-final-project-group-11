@@ -400,6 +400,7 @@
 
 <script>
     let currentMovieInput = ""; // This variable holds the latest user input
+    let currentSuggestions = [];
 
     document.addEventListener("DOMContentLoaded", () => {
         const inputField = document.getElementById("movieInput");
@@ -410,6 +411,12 @@
             if (event.key === "Enter") {
                 event.preventDefault(); // prevent form submission if in a form
                 currentMovieInput = inputField.value.trim();
+
+                // Only allow submission if the input matches a suggestion
+                if (!currentSuggestions.includes(currentMovieInput)) {
+                    alert("Please select a movie from the dropdown list.");
+                    return;
+                }
 
                 if (currentMovieInput) {
                     console.log("User submitted movie:", currentMovieInput);
