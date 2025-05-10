@@ -2,6 +2,7 @@ package com.example.movieGame;
 
 import org.testng.annotations.Test;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -43,6 +44,15 @@ public class MovieLoaderTest {
         //System.out.println(play.randomMovieSelection());
 
 
+        //Use to get a list of all the genres
+        HashSet<String> genreList = new HashSet<>();
+        for (int i = 0; i < movieOutputs.size(); i++) {
+            ArrayList movieGenre = new ArrayList(movieOutputs.get(i).getGenre());
+            for (int j = 0; j < movieOutputs.get(i).getGenre().size(); j++) {
+                genreList.add(movieGenre.get(j).toString());
+            }
+        }
+        System.out.println(genreList);
     }
 
 }

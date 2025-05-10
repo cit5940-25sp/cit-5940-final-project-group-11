@@ -16,7 +16,7 @@ public class GamePlay
     private int numberOfRounds; //tracks # of rounds played (for display)
     private Queue<Movie> lastFiveMovies; //LinkedList of movie objects showing last 5 (FIFO)
     private Movie firstMovie; //first randomly selected movie
-    private String winCondition; //TODO move this to Win class once it's set up
+    private WinConditionStrategy winStrategy; //Define the win strategy //TODO move this to Win class once it's set up
 
     private Player player1;
     private Player player2;
@@ -162,7 +162,6 @@ public class GamePlay
         //Return true if there was no previous movie (as above)
         Movie previous = ((LinkedList<Movie>) lastFiveMovies).peekLast();
         if (previous == null) return true;
-
 
         //Compare across each of the criteria to determine connections
         return sharesConnection(movie.getActors(), previous.getActors()) ||
@@ -324,12 +323,13 @@ public class GamePlay
     }
 
     //TODO move this to win class once created and update UI accordingly
-    public String getWinCondition() {
-        return winCondition;
+    public WinConditionStrategy getWinCondition() {
+        return winStrategy;
     }
+
     //TODO move this to win class once created and update UI accordingly
-    public void setWinCondition(String winCondition) {
-        this.winCondition = winCondition;
+    public void setWinCondition(WinConditionStrategy strategy) {
+        this.winStrategy = strategy;
     }
 }
 

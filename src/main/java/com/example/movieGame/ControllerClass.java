@@ -39,7 +39,10 @@ public class ControllerClass {
         }
 
         GamePlay gamePlay = new GamePlay(player1, player2);
-        gamePlay.setWinCondition(winCondition);
+
+        //Adjusted so the strategy is clearly defined (genre for now)
+        WinConditionStrategy strategy = new GenreWinCondition(winCondition, 5);
+        gamePlay.setWinCondition(strategy);
         session.setAttribute("gamePlay", gamePlay); // Store game in session
 
         return "redirect:/game"; // Redirect to the game view
