@@ -13,6 +13,15 @@ public class GamePlay
     private int cinematographerConnectionUsage; //# of times a cinematographer connection has been made;
     private int composerConnectionUsage; //# of times a composer connection has been made;
 
+
+    //Index Maps
+    private Map<String, Movie> moviesByTitle;
+
+
+
+
+    //Usage Maps
+
     private Map<String, Integer> actorUsage = new HashMap<>();      // Maps actor name to usage count
     private Map<String, Integer> directorUsage = new HashMap<>();   // Maps director name to usage count
     private Map<String, Integer> writerUsage = new HashMap<>();     // Maps writer name to usage count
@@ -32,6 +41,8 @@ public class GamePlay
     Queue<Movie> lastFiveMovies; //LinkedList of movie objects showing last 5 (FIFO)
     private Movie firstMovie; //first randomly selected movie
     private String winCondition; //TODO move this to Win class once it's set up
+
+
 
 
     private Player player1;
@@ -72,6 +83,10 @@ public class GamePlay
             MovieLoader.creditCSVRead();
             MovieLoader.moviesCSVRead();
             availableMovies = MovieLoader.createMovieFromFiles();
+
+
+            // build the index after loading the movies
+            buildIndex();
         } catch (Exception e) {
             System.err.println("Error generating movie list.");
         }
@@ -90,14 +105,38 @@ public class GamePlay
         firstMovie = randomMovieSelection();
 
         //build trie to be used in the autocomplete
-        autocomplete = new Autocomplete();
-        autocomplete.buildTrie("autocompleteTesting.txt",5); //TODO update this filename to be csv after done testing
+        //autocomplete = new Autocomplete();
+        //autocomplete.buildTrie("autocompleteTesting.txt",5); //TODO update this filename to be csv after done testing
     }
+
+
+
+    // build the index here, and add each movie to autocomplete
+    private void buildIndex() {
+        moviesByTitle = new HashMap<>();
+        autocomplete = new Autocomplete();
+
+        // iterate over all movies
+        for (Movie movie : availableMovies) {
+            //put in map of movie title, movie
+            moviesByTitle.put(movie.getMovieTitle().toLowerCase(), movie);
+
+            // create autocomplete trie
+            autocomplete.addWord(movie.getMovieTitle().toLowerCase(), movie.getMovieID());
+
+
+
+
+        }
+    }
+
 
     /**
      * selects first move for the start of the game from within index
      *
      */
+
+
     public Movie randomMovieSelection() {
 
         try {

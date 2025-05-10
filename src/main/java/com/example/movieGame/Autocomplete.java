@@ -41,6 +41,9 @@ public class Autocomplete implements IAutocomplete {
             rootNode = new Node();
         }
 
+
+        // comment this out because we actually need numbers, weird chars, etc
+
         //check for special character
         boolean specialChar = false;
         for (char chr : word.toCharArray()) {
@@ -52,6 +55,9 @@ public class Autocomplete implements IAutocomplete {
         if (specialChar) {
             return;
         }
+
+        word = word.toLowerCase();
+
 
         int len = word.length(); //capture length of word
         int charCounter = 1; //track which character in the word it is
@@ -267,8 +273,10 @@ public class Autocomplete implements IAutocomplete {
     public static void main(String[] args) {
         Autocomplete autocomplete = new Autocomplete();
         //autocomplete.addWord("test",2);
-        autocomplete.buildTrie("file4.txt",2);
-        autocomplete.getSuggestions("cla");
+        //autocomplete.buildTrie("file4.txt",2);
+        //autocomplete.getSuggestions("cla");
+
+
     }
 
 }
