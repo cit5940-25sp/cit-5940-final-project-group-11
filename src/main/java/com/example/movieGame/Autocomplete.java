@@ -136,7 +136,7 @@ public class Autocomplete implements IAutocomplete {
             rootNode = new Node();
             currentNode = rootNode;
             //loop through each line in the file
-            //TODO update this so that it's using/reading in the csv file and movie info correctly
+            //TODO AUTOCOMPLETE update this so that it's using/reading in the csv file and movie info
             FileInputStream fis = new FileInputStream(filename);
             BufferedReader br = new BufferedReader(new InputStreamReader(fis));
             String line = br.readLine();
