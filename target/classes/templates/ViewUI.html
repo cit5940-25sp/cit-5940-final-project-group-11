@@ -58,6 +58,7 @@
         .movie-input {
             flex-grow: 1;
             text-align: center;
+            position: relative;
         }
         .movie-input input {
             width: 60%;
@@ -119,6 +120,11 @@
         .player2-progress {
             top: 250px;
             right: 75px;
+        }
+        #autocomplete-list div {
+            text-align: left;
+            padding: 8px;
+            cursor: pointer;
         }
     </style>
 
@@ -261,6 +267,17 @@
         </div>
         <div class="movie-input">
             <input type="text" id="movieInput" placeholder="Enter a movie..." />
+            <div id="autocomplete-list" style="
+                position: absolute;
+                top: 100%;               /* place it directly under the input field */
+                left: 20%;
+                width: 60%;              /* match the input width */
+                background: white;
+                border: 1px solid #ccc;
+                z-index: 1000;
+                max-height: 200px;
+                overflow-y: auto;
+            "></div>
         </div>
         <div class="game-info-right">
             <p><b>Time Left:</b> <span id="timer">30</span>s</p>
@@ -312,14 +329,25 @@
 
 
 
+<!-- Result Screen -->
+<div id="resultScreen" class="screen">
+    <h1>Game Over</h1>
+    <p><strong>Winner:</strong> <span id="winnerName">TBD</span></p>
+    <p><strong>Loser:</strong> <span id="loserName">TBD</span></p>
+    <p><strong>Reason for losing:</strong> <span id="loseReason">Time ran out</span></p>
+    <button onclick="showScreen('initialScreen')">Back to Start</button>
+</div>
+
+
+
 <!-- Timer -->
 <script>
-    let timeLeft = 30;
+    let timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
     let timerInterval;
 
     function startTimer() {
         const timerDisplay = document.getElementById("timer");
-        timeLeft = 30;
+        timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
         timerDisplay.textContent = timeLeft;
 
         clearInterval(timerInterval); // Clear any existing interval first
@@ -334,17 +362,23 @@
                 console.log("Time's up!");
 
                 // Trigger backend endpoint
-                fetch("/timeUp", {
+                fetch("/endGame?reason=time", {
                     method: "POST"
                 })
-                    .then(response => {
-                        if (!response.ok) {
-                            console.error("Server failed to handle timeout.");
-                        } else {
-                            console.log("Server timeout handled.");
-                            // Optional: Reload game data or update UI
-                            loadGameData();
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data || !data.winner || !data.loser) {
+                            console.error("Invalid game over data");
+                            return;
                         }
+
+                        // Set result data
+                        document.getElementById("winnerName").textContent = data.winner;
+                        document.getElementById("loserName").textContent = data.loser;
+                        document.getElementById("loseReason").textContent = data.reason || "Time ran out";
+
+                        // Show result screen
+                        showScreen("resultScreen");
                     });
             }
         }, 1000);
@@ -362,6 +396,85 @@
     const gameScreen = document.getElementById("gameScreen");
     gameScreenObserver.observe(gameScreen, { attributes: true });
 </script>
+
+
+<script>
+    let currentMovieInput = ""; // This variable holds the latest user input
+    let currentSuggestions = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const inputField = document.getElementById("movieInput");
+        const suggestionBox = document.getElementById("autocomplete-list");
+
+        // Handle Enter key to submit movie
+        inputField.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // prevent form submission if in a form
+                currentMovieInput = inputField.value.trim();
+
+                // Only allow submission if the input matches a suggestion
+                if (!currentSuggestions.includes(currentMovieInput)) {
+                    alert("Please select a movie from the dropdown list.");
+                    return;
+                }
+
+                if (currentMovieInput) {
+                    console.log("User submitted movie:", currentMovieInput);
+
+                    fetch("/submitMovie", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
+                        body: `movie=${encodeURIComponent(currentMovieInput)}`
+                    }).then(response => {
+                        if (response.ok) {
+                            inputField.value = ""; // clear input after submission
+                            suggestionBox.innerHTML = ""; // clear suggestions too
+                        } else {
+                            alert("There was an error submitting your movie.");
+                        }
+                    });
+                }
+            }
+        });
+
+        // Handle typing for autocomplete
+        inputField.addEventListener("input", function () {
+            const query = inputField.value.trim();
+            if (!query) {
+                suggestionBox.innerHTML = "";
+                return;
+            }
+
+            fetch(`/autocomplete?query=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(suggestions => {
+                    suggestionBox.innerHTML = "";
+                    suggestions.forEach(suggestion => {
+                        const div = document.createElement("div");
+                        div.textContent = suggestion;
+                        div.style.padding = "8px";
+                        div.style.cursor = "pointer";
+                        div.addEventListener("click", () => {
+                            inputField.value = suggestion;
+                            suggestionBox.innerHTML = "";
+                        });
+                        suggestionBox.appendChild(div);
+                    });
+                });
+        });
+
+        // Optional: hide suggestions when clicking outside
+        document.addEventListener("click", function (e) {
+            if (e.target !== inputField) {
+                suggestionBox.innerHTML = "";
+            }
+        });
+    });
+</script>
+
+
 
 
 </body>

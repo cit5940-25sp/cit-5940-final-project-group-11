@@ -38,6 +38,10 @@ public class GamePlay
     private Player player2;
     private String player1Name;
 
+    private Autocomplete autocomplete;
+
+    private List<Movie> availableMovies;
+
     private ArrayList<SingleConnection> linksToPreviousMovie;  //list of connections to previous movie
 
     /**
@@ -64,7 +68,13 @@ public class GamePlay
         player2 = new Player(player2Name, false);
 
         //set up data file
-        //TODO (call class here)
+        try {
+            MovieLoader.creditCSVRead();
+            MovieLoader.moviesCSVRead();
+            availableMovies = MovieLoader.createMovieFromFiles();
+        } catch (Exception e) {
+            System.err.println("Error generating movie list.");
+        }
 
         //randomly select movie
         //TODO REMOVE later - for UI testing only
@@ -75,9 +85,13 @@ public class GamePlay
         HashSet<String> cinematographers = new HashSet<>();
         HashSet<String> composers = new HashSet<>();
         firstMovie = new Movie("Jaws",24913, 1909L,genre,actors,directors,writers,cinematographers,composers);*/
-
-        //TODO (keep the below line, uncomment it after done with UI testing)
+        //randomly select first movie
+        //TODO (keep the below line, remove above after done with UI testing)
         firstMovie = randomMovieSelection();
+
+        //build trie to be used in the autocomplete
+        autocomplete = new Autocomplete();
+        autocomplete.buildTrie("autocompleteTesting.txt",5); //TODO update this filename to be csv after done testing
     }
 
     /**
@@ -88,14 +102,18 @@ public class GamePlay
 
         try {
             // Check if data is loaded; if not, load it
-
-            if (MovieLoader.createMovieFromFiles() == null || MovieLoader.createMovieFromFiles().isEmpty()) {
+            //TODO - not 100% sure, but i think that the next few lines of text are creating the full list of movies object 3 times
+            // (twice in the if statement and then once when setting up available movies)
+            // i moved the MovieLoader.creditCSVRead() and .moviesCSVRead() to the constructor, so the data gets loaded immediately
+            // i think then that the next 6 lines can all go away, if availableMovies becomes an instance variable instead and is also
+            // initialized in the constructor
+            // I made this change, and seems like it still works
+            /*if (MovieLoader.createMovieFromFiles() == null || MovieLoader.createMovieFromFiles().isEmpty()) {
                 // If data hasn't been loaded yet, load it
                 MovieLoader.creditCSVRead();
                 MovieLoader.moviesCSVRead();
             }
-
-            List<Movie> availableMovies = MovieLoader.createMovieFromFiles();
+            List<Movie> availableMovies = MovieLoader.createMovieFromFiles();*/
 
 
             // check that there are movies available
@@ -395,6 +413,10 @@ public class GamePlay
     public Movie getFirstMovie() {
         return firstMovie;
     }
+    public Autocomplete getAutocomplete() {
+        return autocomplete;
+    }
+
     //TODO move this to win class once created and update UI accordingly
     public String getWinCondition() {
         return winCondition;
