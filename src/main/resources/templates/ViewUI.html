@@ -312,14 +312,25 @@
 
 
 
+<!-- Result Screen -->
+<div id="resultScreen" class="screen">
+    <h1>Game Over</h1>
+    <p><strong>Winner:</strong> <span id="winnerName">TBD</span></p>
+    <p><strong>Loser:</strong> <span id="loserName">TBD</span></p>
+    <p><strong>Reason for losing:</strong> <span id="loseReason">Time ran out</span></p>
+    <button onclick="showScreen('initialScreen')">Back to Start</button>
+</div>
+
+
+
 <!-- Timer -->
 <script>
-    let timeLeft = 30;
+    let timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
     let timerInterval;
 
     function startTimer() {
         const timerDisplay = document.getElementById("timer");
-        timeLeft = 30;
+        timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
         timerDisplay.textContent = timeLeft;
 
         clearInterval(timerInterval); // Clear any existing interval first
@@ -334,17 +345,23 @@
                 console.log("Time's up!");
 
                 // Trigger backend endpoint
-                fetch("/timeUp", {
+                fetch("/endGame?reason=time", {
                     method: "POST"
                 })
-                    .then(response => {
-                        if (!response.ok) {
-                            console.error("Server failed to handle timeout.");
-                        } else {
-                            console.log("Server timeout handled.");
-                            // Optional: Reload game data or update UI
-                            loadGameData();
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data || !data.winner || !data.loser) {
+                            console.error("Invalid game over data");
+                            return;
                         }
+
+                        // Set result data
+                        document.getElementById("winnerName").textContent = data.winner;
+                        document.getElementById("loserName").textContent = data.loser;
+                        document.getElementById("loseReason").textContent = data.reason || "Time ran out";
+
+                        // Show result screen
+                        showScreen("resultScreen");
                     });
             }
         }, 1000);
@@ -362,6 +379,43 @@
     const gameScreen = document.getElementById("gameScreen");
     gameScreenObserver.observe(gameScreen, { attributes: true });
 </script>
+
+
+<script>
+    let currentMovieInput = ""; // This variable holds the latest user input
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const inputField = document.getElementById("movieInput");
+
+        inputField.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // prevent form submission if in a form
+                currentMovieInput = inputField.value.trim();
+
+                if (currentMovieInput) {
+                    console.log("User submitted movie:", currentMovieInput);
+
+                    // Example: you could send to backend here
+                    fetch("/submitMovie", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
+                        body: `movie=${encodeURIComponent(currentMovieInput)}`
+                    }).then(response => {
+                        if (response.ok) {
+                            inputField.value = ""; // clear input after submission
+                            // Possibly refresh game data or update UI
+                        } else {
+                            alert("There was an error submitting your movie.");
+                        }
+                    });
+                }
+            }
+        });
+    });
+</script>
+
 
 
 </body>
