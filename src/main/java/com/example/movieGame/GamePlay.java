@@ -18,8 +18,6 @@ public class GamePlay
     private Map<String, Movie> moviesByTitle;
 
 
-
-
     //Usage Maps
 
     private Map<String, Integer> actorUsage = new HashMap<>();      // Maps actor name to usage count
@@ -52,6 +50,7 @@ public class GamePlay
     private Autocomplete autocomplete;
 
     private List<Movie> availableMovies;
+    private HashMap<Integer, Movie> availableMoviesHashMap;
 
     private ArrayList<SingleConnection> linksToPreviousMovie;  //list of connections to previous movie
 
@@ -83,7 +82,7 @@ public class GamePlay
             MovieLoader.creditCSVRead();
             MovieLoader.moviesCSVRead();
             availableMovies = MovieLoader.createMovieFromFiles();
-
+            availableMoviesHashMap = MovieLoader.getMoviesHashMap(); //used to look up movie object after pulling from autocomplete
 
             // build the index after loading the movies
             buildIndex();
@@ -92,21 +91,7 @@ public class GamePlay
         }
 
         //randomly select movie
-        //TODO REMOVE later - for UI testing only
-        /*HashSet<String> genre = new HashSet<>(Arrays.asList("Horror", "Drama", "Action"));
-        HashSet<String> actors = new HashSet<>();
-        HashSet<String> directors = new HashSet<>();
-        HashSet<String> writers = new HashSet<>();
-        HashSet<String> cinematographers = new HashSet<>();
-        HashSet<String> composers = new HashSet<>();
-        firstMovie = new Movie("Jaws",24913, 1909L,genre,actors,directors,writers,cinematographers,composers);*/
-        //randomly select first movie
-        //TODO (keep the below line, remove above after done with UI testing)
         firstMovie = randomMovieSelection();
-
-        //build trie to be used in the autocomplete
-        //autocomplete = new Autocomplete();
-        //autocomplete.buildTrie("autocompleteTesting.txt",5); //TODO update this filename to be csv after done testing
     }
 
 
@@ -122,7 +107,8 @@ public class GamePlay
             moviesByTitle.put(movie.getMovieTitle().toLowerCase(), movie);
 
             // create autocomplete trie
-            autocomplete.addWord(movie.getMovieTitle().toLowerCase(), movie.getMovieID());
+            String titleAndYear = movie.getMovieTitle().toLowerCase() + ", " + movie.getReleaseYear();
+            autocomplete.addWord(titleAndYear, movie.getMovieID());
             //TODO: note - tolowercase functionality here/in autocomplete means dropdown shows as all lowercase
             // to show camelCase in teh dropdown, could change weight to be a string that records the camel case title
             // and return that instead of the all lowercase version...actually that may not work...regardless,
@@ -243,27 +229,6 @@ public class GamePlay
     }
 
 
-
-    /**
-     *
-     * tracks time for each player
-     *
-     */
-    public void thirtySecondTimerStart() {
-        //TODO
-        //not sure what it should return/ how this would work
-
-        if (gameTimer != null) {
-            gameTimer.cancel();
-        }
-
-        gameTimer = new Timer();
-        timerActive = true;
-        timeRemaining = maxTimePerTurn;
-
-
-
-    }
 
     /**
      * updates game state and variables based on user entry
@@ -425,6 +390,12 @@ public class GamePlay
 
         actorUsage.put(name,freq);
     }
+
+
+    public Movie findTermById(int movieId) {
+        return availableMoviesHashMap.get(movieId);
+    }
+
 
 
     /**

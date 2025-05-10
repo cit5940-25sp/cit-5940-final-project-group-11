@@ -234,7 +234,18 @@ public class Autocomplete implements IAutocomplete {
         //loop through the rest of the trie past the prefix, and return a list of terms
         // (with word and weight)
         //traversal through all 26 elements of each node
-        trieTraversal(getSubTrie(prefix.toLowerCase()));
+        Node prefixNode = getSubTrie(prefix.toLowerCase());
+
+        // Check if the prefix itself is a word
+        if (prefixNode != null && prefixNode.getWords() > 0) {
+            String newTerm = prefixNode.getTerm().getTerm();
+            long newWeight = prefixNode.getTerm().getWeight();
+            Term validWord = new Term(String.valueOf(newTerm), newWeight);
+            suggestions.add(validWord);
+        }
+
+        // Then continue traversal of children
+        trieTraversal(prefixNode);
         return suggestions;
     }
 
