@@ -3,9 +3,11 @@ package com.example.movieGame;
 //import ch.qos.logback.core.model.Model;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.ui.Model;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 //TODO delete this line - update just for the sake of github updating
 
@@ -42,20 +44,86 @@ public class ControllerClass {
         return "redirect:/game"; // Redirect to the game view
     }
 
-    @PostMapping("/timeUp")
+    @PostMapping("/endGame")
     @ResponseBody
-    public ResponseEntity<String> handleTimeUp(HttpSession session) {
+    public Map<String,String> handleEndGame(@RequestParam("reason") String reason, HttpSession session) {
         GamePlay gamePlay = (GamePlay) session.getAttribute("gamePlay");
+        Map<String, String> result = new HashMap<>();
+
         if (gamePlay == null) {
-            return ResponseEntity.badRequest().body("No active game");
+            result.put("error", "No active game");
+            return result;
         }
 
-        // You can modify the logic here: TODO: update this to add logic for what to do when timer runs out
-        //gamePlay.incrementRound();  // assuming such a method exists
-        //gamePlay.switchPlayer();    // assuming you track active player
+        String winner = "Unknown", loser = "Unknown";
 
-        return ResponseEntity.ok("Time processed");
+        switch(reason) {
+            case "time":
+                //set winner as activeplayer (ie the person who ran out of time)
+                loser = gamePlay.getActivePlayerName();
+                winner = gamePlay.getPlayer1().getUserName();
+                if (loser.equals(gamePlay.getPlayer1().getUserName())) {
+                    winner = gamePlay.getPlayer2().getUserName();
+                }
+                break;
+            case "winConditionMet":
+                //TODO update logic
+                //winner = gamePlay.getWinner().getUserName();  // You'd implement this logic
+                //loser = gamePlay.getLoser().getUserName();
+                break;
+            case "movieAlreadyUsed":
+                //TODO update logic
+                //player submits a duplicate movie
+                //winner = gamePlay.getInactivePlayer().getUserName();
+                //loser = gamePlay.getActivePlayer().getUserName();
+                break;
+            case "connectionUsedTooManyTimes":
+                //TODO update logic
+                //player uses the connection too many times
+                //winner = gamePlay.getInactivePlayer().getUserName();
+                //loser = gamePlay.getActivePlayer().getUserName();
+                break;
+            default:
+                winner = "Unknown";
+                loser = "Unknown";
+                break;
+        }
+
+        result.put("winner", winner);
+        result.put("loser", loser);
+        result.put("reason", mapReasonToText(reason));
+
+        return result;
     }
+
+    private String mapReasonToText(String reasonCode) {
+        switch (reasonCode) {
+            case "time": return "Timer ran out";
+            case "winConditionMet": return "Win condition met";
+            case "movieAlreadyUsed": return "Movie already used";
+            case "connectionUsedTooManyTimes": return "Connection used too many times";
+            default: return "Game ended";
+        }
+    }
+
+    @PostMapping("/submitMovie")
+    @ResponseBody
+    public String handleMovieSubmission(@RequestParam("movie") String movie, HttpSession session) {
+        GamePlay gamePlay = (GamePlay) session.getAttribute("gamePlay");
+        if (gamePlay == null) {
+            return "No active game";
+        }
+
+        //THIS COLLECTS THE MOVIE FROM THE USER'S ENTRY
+        //TODO use a setter method in GamePlay to update the movie
+        // need a way to take the string entered by the user and find the right movie object
+
+        // TODO: Logic to validate the movie, update game state, check win conditions, etc.
+
+        return "OK";
+    }
+
+
 
 
     @GetMapping("/gamestate")
