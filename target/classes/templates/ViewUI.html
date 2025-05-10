@@ -39,6 +39,87 @@
             bottom: 20px;
             right: 20px;
         }
+        .game-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            margin-top: 20px;
+            padding: 1em;
+            flex: 0 0 auto;
+            background-color: white;
+            z-index: 1;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .game-info-left, .game-info-right {
+            text-align: left;
+        }
+        .movie-input {
+            flex-grow: 1;
+            text-align: center;
+        }
+        .movie-input input {
+            width: 60%;
+            padding: 0.5em;
+            font-size: 1em;
+        }
+        .game-scrollable {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding-bottom: 2em; /* So content doesn't touch the bottom */
+            width: 100%;
+        }
+        .game-middle {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 95%;
+            margin-top: 0;
+            position: relative;
+        }
+        .player-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            background-color: #f9f9f9;
+            z-index: 1;
+        }
+        .movie-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 60%;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+        .movie-box {
+            border: 1px solid #ccc;
+            padding: 1em;
+            margin: 0.5em 0;
+            width: 90%;
+            background-color: #f1f1f1;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+        .player1-name {
+            top: 200px;
+            left: 75px;
+        }
+        .player2-name {
+            top: 200px;
+            right: 75px;
+        }
+        .player1-progress {
+            top: 250px;
+            left: 75px;
+        }
+        .player2-progress {
+            top: 250px;
+            right: 75px;
+        }
     </style>
 
     <script>
@@ -51,6 +132,50 @@
             document.getElementById(id).classList.add('visible');
         }
 
+        function loadGameData() {
+            fetch('/gamestate')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("activePlayer").textContent = data.activePlayerName;
+                    document.getElementById("roundCount").textContent = data.numberOfRounds;
+
+                    // Set player name boxes
+                    document.getElementById("player1Box").textContent = data.player1.userName;
+                    document.getElementById("player2Box").textContent = data.player2.userName;
+
+                    //set player progress towards win
+                    document.getElementById("player1ProgressTowardsWin").textContent = data.player1.progressTowardWin;
+                    document.getElementById("player2ProgressTowardsWin").textContent = data.player2.progressTowardWin;
+
+                    //document.getElementById("winConditionDisplay").textContent = data.winCondition;  //TODO update after winCondition is moved to win class
+                    const winConditionMap = {
+                        horror: "4 Horror Movies",
+                        comedy: "4 Comedies",
+                        action: "4 Action Movies",
+                        sciFi: "4 Science Fiction Movies",
+                        drama: "4 Dramas"
+                    };
+                    const readableWinCondition = winConditionMap[data.winCondition] || data.winCondition;
+                    document.getElementById("winConditionDisplay").textContent = readableWinCondition;
+
+
+                    //Set first movie
+                    const movie = data.firstMovie;
+                    document.getElementById("movieTitle").textContent = data.firstMovie.movieTitle;
+                    document.getElementById("releaseYear").textContent = data.firstMovie.releaseYear;
+                    document.getElementById("genreList").textContent = Array.from(movie.genre).join(', ');
+/*
+                    if (movie.linksToPreviousMovie && movie.linksToPreviousMovie.length > 0) {
+                        const formattedLinks = movie.linksToPreviousMovie.map(link =>
+                            `${link.linkType}: ${link.sharedDetail}`
+                        ).join(' | ');
+                        document.getElementById("linkToPrevious").textContent = formattedLinks;
+                    } else {
+                        document.getElementById("linkToPrevious").textContent = "None";
+                    }*/
+                });
+        }
+
         function selectWinCondition(value) {
             selectedWinCondition = value;
             document.querySelectorAll('.win-button').forEach(btn => btn.style.backgroundColor = '');
@@ -58,7 +183,7 @@
         }
 
         function submitSetup() {
-            const player1 = document.getElementById("player1Name").value;
+            const player1 = document.getElementById("player1Name").value;  //this stores the name the user types in Player#1 input field
             const player2 = document.getElementById("player2Name").value;
 
             if (!player1 || !player2 || !selectedWinCondition) {
@@ -74,6 +199,7 @@
                 .then(response => {
                     if (response.ok) {
                         showScreen('gameScreen');
+                        loadGameData();
                     } else {
                         alert("There was an error. Please try again.");
                     }
@@ -107,7 +233,7 @@
         <!-- Right Side: Player Name -->
         <div class="section">
             <h2>Enter the name of Player #1:</h2>
-            <input type="text" id="player1Name" placeholder="Player 1 Name" />
+            <input type="text" id="player1Name" placeholder="Player 1 Name" />  <!-- Sam -->
             <h2>Enter the name of Player #2:</h2>
             <input type="text" id="player2Name" placeholder="Player 2 Name" />
 
@@ -121,10 +247,122 @@
     </div>
 </div>
 
+
+
 <!-- Game Screen -->
 <div id="gameScreen" class="screen">
-    <h2>Game Screen (Coming Soon)</h2>
+    <div class="game-top-bar">
+        <div class="game-info-left">
+            <p><b>Active Player:</b> <span id="activePlayer">Loading...</span></p>
+            <!--<p><b>Active Player:</b> <span id="activePlayer" th:text="${activePlayer}">player1</span></p> -->
+            <!--  <p><b>Active Player:</b> <span id="activePlayer">player1</span></p>  -->
+            <p><b>Win Condition:</b> <span id="winConditionDisplay">[Win Condition]</span></p>
+            <p><b>Rounds Played:</b> <span id="roundCount">error</span></p>
+        </div>
+        <div class="movie-input">
+            <input type="text" id="movieInput" placeholder="Enter a movie..." />
+        </div>
+        <div class="game-info-right">
+            <p><b>Time Left:</b> <span id="timer">30</span>s</p>
+        </div>
+    </div>
+
+    <div class="game-scrollable">
+    <div class="game-middle">
+        <div class="player-name player1-name" id="player1Box">Player 1</div>
+        <div class="player-name player1-progress" id="player1ProgressTowardsWin">##</div>
+        <div class="movie-stack">
+            <!-- This can be generated dynamically with JS -->
+            <div class="movie-box" id="movieDisplay">
+                <strong>Title:</strong> <span id="movieTitle">...</span><br>
+                <strong>Release Year:</strong> <span id="releaseYear">...</span><br>
+                <strong>Genre:</strong> <span id="genreList">...</span><br>
+                <strong>Link to previous:</strong> <span id="linkToPrevious">n/a</span>
+            </div>
+            <div class="movie-box" id="movieDisplay2">
+                <strong>Title:</strong> <span id="movieTitle2">n/a</span><br>
+                <strong>Release Year:</strong> <span id="releaseYear2">n/a</span><br>
+                <strong>Genre:</strong> <span id="genreList2">n/a</span><br>
+                <strong>Link to previous:</strong> <span id="linkToPrevious2">n/a</span>
+            </div>
+            <div class="movie-box" id="movieDisplay3">
+                <strong>Title:</strong> <span id="movieTitle3">n/a</span><br>
+                <strong>Release Year:</strong> <span id="releaseYear3">n/a</span><br>
+                <strong>Genre:</strong> <span id="genreList3">n/a</span><br>
+                <strong>Link to previous:</strong> <span id="linkToPrevious3">n/a</span>
+            </div>
+            <div class="movie-box" id="movieDisplay4">
+                <strong>Title:</strong> <span id="movieTitle4">n/a</span><br>
+                <strong>Release Year:</strong> <span id="releaseYear4">n/a</span><br>
+                <strong>Genre:</strong> <span id="genreList4">n/a</span><br>
+                <strong>Link to previous:</strong> <span id="linkToPrevious4">n/a</span>
+            </div>
+            <div class="movie-box" id="movieDisplay5">
+                <strong>Title:</strong> <span id="movieTitle5">n/a</span><br>
+                <strong>Release Year:</strong> <span id="releaseYear5">n/a</span><br>
+                <strong>Genre:</strong> <span id="genreList5">n/a</span><br>
+                <strong>Link to previous:</strong> <span id="linkToPrevious5">n/a</span>
+            </div>
+        </div>
+        <div class="player-name player2-name" id="player2Box">Player 2</div>
+        <div class="player-name player2-progress" id="player2ProgressTowardsWin">##</div>
+    </div>
+    </div>
 </div>
+
+
+
+<!-- Timer -->
+<script>
+    let timeLeft = 30;
+    let timerInterval;
+
+    function startTimer() {
+        const timerDisplay = document.getElementById("timer");
+        timeLeft = 30;
+        timerDisplay.textContent = timeLeft;
+
+        clearInterval(timerInterval); // Clear any existing interval first
+
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            timerDisplay.textContent = timeLeft;
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerDisplay.textContent = "0"; // Ensure display shows 0
+                console.log("Time's up!");
+
+                // Trigger backend endpoint
+                fetch("/timeUp", {
+                    method: "POST"
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            console.error("Server failed to handle timeout.");
+                        } else {
+                            console.log("Server timeout handled.");
+                            // Optional: Reload game data or update UI
+                            loadGameData();
+                        }
+                    });
+            }
+        }, 1000);
+    }
+
+    // Automatically start timer when game screen becomes visible
+    const gameScreenObserver = new MutationObserver((mutations) => {
+        mutations.forEach(mutation => {
+            if (mutation.target.classList.contains('visible')) {
+                startTimer();
+            }
+        });
+    });
+
+    const gameScreen = document.getElementById("gameScreen");
+    gameScreenObserver.observe(gameScreen, { attributes: true });
+</script>
+
 
 </body>
 </html>
