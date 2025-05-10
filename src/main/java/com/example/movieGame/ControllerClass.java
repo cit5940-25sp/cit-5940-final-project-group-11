@@ -113,22 +113,31 @@ public class ControllerClass {
     // map < str title, movie> title -> title + movie.year
     @PostMapping("/submitMovie")
     @ResponseBody
-    public String handleMovieSubmission(@RequestParam("movie") String movieTitle, HttpSession session) {
+
+    public String handleMovieSubmission(@RequestParam("movieId") int movieId, HttpSession session) {
+
         GamePlay gamePlay = (GamePlay) session.getAttribute("gamePlay");
         if (gamePlay == null) {
             return "No active game";
         }
 
-        //THIS COLLECTS THE MOVIE FROM THE USER'S ENTRY
-        //TODO use a setter method in GamePlay to update the movie
-        // need a way to take the string entered by the user and find the right movie object
+        //find the object using the movieID
+        Movie selectedMovie = gamePlay.findTermById(movieId); // You’ll need to implement this
+        String errorType = "";
+        errorType = gamePlay.userEntry(selectedMovie);
 
-        // TODO: Logic to validate the movie, update game state, check win conditions, etc.
+        if (selectedMovie == null) {
+            return "Movie not found";
+        }
+
+        //TODO add game update logic as well
+        //TODO add logic to handle the errors (errorType) correctly and flow them through to the endGame page
+
 
 
         // get the name of the movie from input
         // search for matching movie in the movies list
-        Movie movie = gamePlay.getMovieFromTitle(movieTitle);
+        //Movie movie = gamePlay.getMovieFromTitle(movieTitle);
         //
         // verify that it is a valid movie
         //MoveResult newMove = gamePlay.validateMove(movie);
@@ -136,7 +145,7 @@ public class ControllerClass {
         // if so
 
 
-        gamePlay.userEntry(movie);
+        //gamePlay.userEntry(movie);
 
         // give movie object to gameplay object
         // if not a valid connection, allow a new choice
@@ -148,19 +157,24 @@ public class ControllerClass {
 
     @GetMapping("/autocomplete")
     @ResponseBody
-    public List<String> autocomplete(@RequestParam("query") String query, HttpSession session) {
+    public List<Map<String, String>> autocomplete(@RequestParam("query") String query, HttpSession session) {
         GamePlay gamePlay = (GamePlay) session.getAttribute("gamePlay");
         if (gamePlay == null) return List.of();
 
-        Autocomplete autocomplete = gamePlay.getAutocomplete(); // adjust as needed
+        Autocomplete autocomplete = gamePlay.getAutocomplete();
         List<ITerm> suggestions = autocomplete.getSuggestions(query);
 
-        int k = 8;
         return suggestions.stream()
-                .limit(k)
-                .map(ITerm::getTerm) // or getQuery(), etc.
+                .limit(8)
+                .map(term -> {
+                    Map<String, String> map = new HashMap<>();
+                    map.put("id", String.valueOf(term.getWeight()));  // assuming ITerm has getId()
+                    map.put("term", term.getTerm());
+                    return map;
+                })
                 .toList();
     }
+
 
 
 
