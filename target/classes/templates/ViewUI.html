@@ -452,16 +452,17 @@
             fetch(`/autocomplete?query=${encodeURIComponent(query)}`)
                 .then(res => res.json())
                 .then(suggestions => {
+                    currentSuggestions = suggestions; // Save the full objects
                     suggestionBox.innerHTML = "";
                     suggestions.forEach(suggestion => {
                         const div = document.createElement("div");
-                        div.textContent = suggestion;
+                        div.textContent = suggestion.term;
                         div.style.padding = "8px";
                         div.style.cursor = "pointer";
                         div.addEventListener("click", () => {
-                            inputField.value = suggestion;
+                            inputField.value = suggestion.term;
                             suggestionBox.innerHTML = "";
-                            submitMovie(suggestion);
+                            submitMovie(suggestion.id);  // Submit the unique ID, not the term
                         });
                         suggestionBox.appendChild(div);
                     });
@@ -475,13 +476,13 @@
             }
         });
 
-        function submitMovie(movie) {
+        function submitMovie(movieId) {
             fetch("/submitMovie", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
-                body: `movie=${encodeURIComponent(movie)}`
+                body: `movieId=${encodeURIComponent(movieId)}`
             }).then(response => {
                 if (response.ok) {
                     document.getElementById("movieInput").value = "";
