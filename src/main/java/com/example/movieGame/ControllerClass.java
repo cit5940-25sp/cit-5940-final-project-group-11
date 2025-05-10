@@ -107,9 +107,13 @@ public class ControllerClass {
         }
     }
 
+
+
+    // add another request param for disambiguation (year?)
+    // map < str title, movie> title -> title + movie.year
     @PostMapping("/submitMovie")
     @ResponseBody
-    public String handleMovieSubmission(@RequestParam("movie") String movie, HttpSession session) {
+    public String handleMovieSubmission(@RequestParam("movie") String movieTitle, HttpSession session) {
         GamePlay gamePlay = (GamePlay) session.getAttribute("gamePlay");
         if (gamePlay == null) {
             return "No active game";
@@ -120,6 +124,23 @@ public class ControllerClass {
         // need a way to take the string entered by the user and find the right movie object
 
         // TODO: Logic to validate the movie, update game state, check win conditions, etc.
+
+
+        // get the name of the movie from input
+        // search for matching movie in the movies list
+        Movie movie = gamePlay.getMovieFromTitle(movieTitle);
+        //
+        // verify that it is a valid movie
+        //MoveResult newMove = gamePlay.validateMove(movie);
+        // validation is handled by gameplay.userEntry
+        // if so
+
+
+        gamePlay.userEntry(movie);
+
+        // give movie object to gameplay object
+        // if not a valid connection, allow a new choice
+        //
 
         return "OK";
     }
