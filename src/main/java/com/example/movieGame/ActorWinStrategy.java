@@ -12,10 +12,16 @@ public class ActorWinStrategy implements WinStrategy {
 
     @Override
     public boolean checkWin(Player player, Movie movie) {
+
+        if (movie == null || movie.getGenre() == null) {
+            return false;
+        }
+
         Set<String> actors = movie.getActors();
         if (actors != null && actors.contains(targetActor)) {
             player.setProgressTowardWin();
         }
+
         return player.getProgressTowardWin() >= 5;
     }
 
