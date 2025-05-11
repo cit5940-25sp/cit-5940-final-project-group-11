@@ -178,10 +178,8 @@
                     document.getElementById("player1ProgressTowardsWin").textContent = data.player1.progressTowardWin;
                     document.getElementById("player2ProgressTowardsWin").textContent = data.player2.progressTowardWin;
 
-                    //TODO i think this would be where you'd also update each of the 5 boxes? potentially?
-
                     /*
-                    //document.getElementById("winConditionDisplay").textContent = data.winCondition;  //TODO update after winCondition is moved to win class
+                    //document.getElementById("winConditionDisplay").textContent = data.winCondition;
                     const winConditionMap = {
                         horror: "4 Horror Movies",
                         comedy: "4 Comedies",
@@ -396,7 +394,7 @@
     <h1>Game Over</h1>
     <p><strong>Winner:</strong> <span id="winnerName">TBD</span></p>
     <p><strong>Loser:</strong> <span id="loserName">TBD</span></p>
-    <p><strong>Reason for losing:</strong> <span id="loseReason">Time ran out</span></p>
+    <p><strong>Reason for loss/win:</strong> <span id="loseReason">Time ran out</span></p>
     <button onclick="showScreen('initialScreen')">Back to Start</button>
 </div>
 
@@ -404,12 +402,12 @@
 
 <!-- Timer -->
 <script>
-    let timeLeft = 30;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
+    let timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
     let timerInterval;
 
     function startTimer() {
         const timerDisplay = document.getElementById("timer");
-        timeLeft = 30;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
+        timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
         timerDisplay.textContent = timeLeft;
 
         clearInterval(timerInterval); // Clear any existing interval first
@@ -549,6 +547,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.resultScreen) {
+                        clearInterval(timerInterval);  // Stop the timer to prevent it from firing again
                         // Show result screen with game over info
                         document.getElementById("winnerName").textContent = data.winner;
                         document.getElementById("loserName").textContent = data.loser;

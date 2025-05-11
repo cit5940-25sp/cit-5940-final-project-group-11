@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//TODO delete this line - update just for the sake of github updating
 
 /**
  * tracks logic of gameplay
@@ -155,6 +154,10 @@ public class ControllerClass {
                 response.put("reason", "Connection made too many times");
                 findWinnerAndLoser(response, gamePlay);
             }
+            case "Valid User Entry" -> {
+                response.put("resultScreen", false); // No need to show result screen
+                response.put("message", "Valid connection");
+            }
             case "Win condition met" -> {
                 response.put("resultScreen", true);
                 response.put("reason", "Win condition met");
@@ -167,26 +170,10 @@ public class ControllerClass {
                 response.put("winner", winner);
                 response.put("loser", loser);
             }
-            case "Valid User Entry" -> {
-                //TODO - add actions here to update the screen
-                System.out.println("check");
-                response.put("resultScreen", false); // No need to show result screen
-                response.put("message", "Valid connection");
-
-                if (gamePlay.getActivePlayer().getProgressTowardWin() >= 5) {
-                    response.put("resultScreen", true);
-                    response.put("reason", "Win condition met");
-                    response.put("winner", gamePlay.getActivePlayer().getUserName());
-                    response.put("loser", gamePlay.getActivePlayer().getUserName().equals(gamePlay.getPlayer1().getUserName())
-                            ? gamePlay.getPlayer2().getUserName()
-                            : gamePlay.getPlayer1().getUserName());
-                }
-            }
             default -> {
                 response.put("error", "Unknown message");
             }
         }
-
         return response;
     }
 
@@ -245,11 +232,11 @@ public class ControllerClass {
             gamePlay.getPlayer1().setIsActive(true);
         }*/
         //update win conditoin
-        //TODO
+        //
         //model.addAttribute("winCondition", gamePlay.getWinCondition());
 
         //update number of rounds
-        //TODO
+        //
         //model.addAttribute("roundCount", gamePlay.getRoundCount());
         return "ViewUI";
     }
