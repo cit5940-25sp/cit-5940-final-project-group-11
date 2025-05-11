@@ -9,14 +9,16 @@ public class Player {
     private String userName;
     private int progressTowardWin;
     private boolean isActive;
+    private boolean isInactive;
 
     /**
      * Constructor
      */
-    public Player(String name, boolean activePlayer) {
+    public Player(String name, boolean activePlayer, boolean inactivePlayer) {
         this.userName = name; //set player's name
-        this.progressTowardWin = 0; //TODO - does having this as an integer work? given the way WinCondition is set up?
+        this.progressTowardWin = 0;
         this.isActive = activePlayer;
+        this.isInactive = inactivePlayer;
     }
 
     /**
@@ -35,8 +37,6 @@ public class Player {
      * @return progress toward win
      */
     public int getProgressTowardWin() {
-        //TODO: note - this might not be necessary given how the winCondition classes are set up...
-        // (possibly remove)
         return this.progressTowardWin;
     }
 
@@ -48,6 +48,14 @@ public class Player {
     public boolean getIsActive() {
         return this.isActive;
     }
+    /**
+     * Return whether the player is inactive
+     *
+     * @return 1 if player is inactive, 0 if not
+     */
+    public boolean getIsInactive() {
+        return this.isInactive;
+    }
 
     /**
      * set active player status
@@ -56,6 +64,14 @@ public class Player {
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
+    /**
+     * set active player status
+     * @Parameter whether they're the active player
+     */
+    public void setIsInactive(boolean isInactive) {
+        this.isInactive = isInactive;
+    }
+
     /**
      * set progress toward win
      */

@@ -77,8 +77,8 @@ public class GamePlay
         lastFiveMovies = new LinkedList<>();
 
         //create and designate players
-        player1 = new Player(player1Name, true);
-        player2 = new Player(player2Name, false);
+        player1 = new Player(player1Name, true,false);
+        player2 = new Player(player2Name, false,true);
 
         //set up data file
         try {
@@ -314,10 +314,19 @@ public class GamePlay
             return player2;
         }
     }
+    public Player getInactivePlayer() {
+        if (player1.getIsInactive()) {
+            return player1;
+        } else {
+            return player2;
+        }
+    }
 
     public void switchActivePlayer() {
         player1.setIsActive(!player1.getIsActive());
         player2.setIsActive(!player2.getIsActive());
+        player1.setIsInactive(!player1.getIsInactive());
+        player2.setIsActive(!player2.getIsInactive());
     }
 
 
