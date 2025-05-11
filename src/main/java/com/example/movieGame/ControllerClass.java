@@ -155,6 +155,18 @@ public class ControllerClass {
                 response.put("reason", "Connection made too many times");
                 findWinnerAndLoser(response, gamePlay);
             }
+            case "Win condition met" -> {
+                response.put("resultScreen", true);
+                response.put("reason", "Win condition met");
+
+                String winner = gamePlay.getActivePlayer().getUserName();
+                String loser = winner.equals(gamePlay.getPlayer1().getUserName())
+                        ? gamePlay.getPlayer2().getUserName()
+                        : gamePlay.getPlayer1().getUserName();
+
+                response.put("winner", winner);
+                response.put("loser", loser);
+            }
             case "Valid User Entry" -> {
                 //TODO - add actions here to update the screen
                 System.out.println("check");
