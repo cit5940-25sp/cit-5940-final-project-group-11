@@ -51,6 +51,16 @@
             z-index: 1;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             border-radius: 8px;
+
+            //Added to enable playing of both players
+            <div>
+            <label for="currentPlayerSelector"><b>Controlling:</b></label>
+            <select id="currentPlayerSelector" onchange="loadGameData()">
+                <option value="player1">Player A</option>
+                <option value="player2">Player B</option>
+                </select>
+            </div>
+
         }
         .game-info-left, .game-info-right {
             text-align: left;
@@ -163,6 +173,19 @@
             fetch('/gamestate')
                 .then(res => res.json())
                 .then(data => {
+
+                    //Added for testing only
+                    const selected = document.getElementById("currentPlayerSelector").value;
+                    const currentUser = selected === "player1" ? data.player1.userName : data.player2.userName;
+
+                    const isActive = currentUser === data.activePlayerName;
+
+                    const inputField = document.getElementById("movieInput");
+                    inputField.disabled = !isActive;
+                    inputField.placeholder = isActive
+                        ? "Enter a movie..."
+                        : `Waiting for ${data.activePlayerName}'s turn...`;
+
                     document.getElementById("activePlayer").textContent = data.activePlayerName;
                     document.getElementById("roundCount").textContent = data.numberOfRounds;
 
@@ -400,12 +423,12 @@
 
 <!-- Timer -->
 <script>
-    let timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
+    let timeLeft = 30;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
     let timerInterval;
 
     function startTimer() {
         const timerDisplay = document.getElementById("timer");
-        timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
+        timeLeft = 30;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
         timerDisplay.textContent = timeLeft;
 
         clearInterval(timerInterval); // Clear any existing interval first

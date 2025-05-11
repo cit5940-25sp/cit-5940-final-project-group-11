@@ -160,6 +160,15 @@ public class ControllerClass {
                 System.out.println("check");
                 response.put("resultScreen", false); // No need to show result screen
                 response.put("message", "Valid connection");
+
+                if (gamePlay.getActivePlayer().getProgressTowardWin() >= 5) {
+                    response.put("resultScreen", true);
+                    response.put("reason", "Win condition met");
+                    response.put("winner", gamePlay.getActivePlayer().getUserName());
+                    response.put("loser", gamePlay.getActivePlayer().getUserName().equals(gamePlay.getPlayer1().getUserName())
+                            ? gamePlay.getPlayer2().getUserName()
+                            : gamePlay.getPlayer1().getUserName());
+                }
             }
             default -> {
                 response.put("error", "Unknown message");

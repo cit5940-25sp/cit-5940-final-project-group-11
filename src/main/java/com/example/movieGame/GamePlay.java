@@ -13,6 +13,9 @@ public class GamePlay
     private int cinematographerConnectionUsage; //# of times a cinematographer connection has been made;
     private int composerConnectionUsage; //# of times a composer connection has been made;
 
+    //Win Strategy tracker
+    private WinStrategy winStrategy;
+    private boolean gameEnded = false;
 
     //Index Maps
     private Map<String, Movie> moviesByTitle;
@@ -244,6 +247,11 @@ public class GamePlay
      */
     public String userEntry(Movie movie) {
 
+        //Return game has already ended if gameEnded is true
+        if (gameEnded) {
+            return "Game already ended";
+        }
+
         // First validate the move
         MoveResult result = validateMove(movie);
 
@@ -292,6 +300,13 @@ public class GamePlay
 
         // Add movie to used list
         moviesUsed.add(movie.getMovieID());
+
+        //Check whether the move resulted in winning
+        boolean hasWon = winStrategy.checkWin(getActivePlayer(), movie);
+        if (hasWon) {
+            gameEnded = true;
+            return "Win condition met";
+        }
 
         // Increment number of rounds played
         numberOfRounds++;
@@ -456,11 +471,19 @@ public class GamePlay
 
     //TODO move this to win class once created and update UI accordingly
     public String getWinCondition() {
+
         return winCondition;
+
     }
+
     //TODO move this to win class once created and update UI accordingly
     public void setWinCondition(String winCondition) {
+
+        //Set the winCondition as what is entered in the UI
+        //Define the strategy based on the entered genre
         this.winCondition = winCondition;
+        this.winStrategy = new GenreWinStrategy(winCondition);
+
     }
 
 
