@@ -23,7 +23,7 @@ public class ControllerClass {
     public String initialDisplay() {
         return "ViewUI"; // Loads ViewUI.html from templates
     }
-    
+
     @PostMapping("/setup")
     public String handleSetup(
             @RequestParam("player1") String player1,
@@ -66,31 +66,6 @@ public class ControllerClass {
                     winner = gamePlay.getPlayer2().getUserName();
                 }
                 break;
-/*
-            case "winConditionMet":
-                winner = gamePlay.getActivePlayerName();
-                if (winner.equals(winner)) {
-                    loser = gamePlay.getPlayer2().getUserName();
-                }
-                break;
-
-            case "movie already used":
-            case "no valid connection":
-                // Active player made a mistake → they lose
-                loser = gamePlay.getActivePlayerName();
-                winner = gamePlay.getPlayer1().getUserName();
-                if (loser.equals(winner)) {
-                    winner = gamePlay.getPlayer2().getUserName();
-                }
-
-            case "connectionUsedTooManyTimes":
-                loser = gamePlay.getActivePlayerName();
-                winner = gamePlay.getPlayer1().getUserName();
-                if (loser.equals(winner)) {
-                    winner = gamePlay.getPlayer2().getUserName();
-                }
-                break;
-*/
             default:
                 break;
         }
@@ -98,21 +73,10 @@ public class ControllerClass {
         result.put("winner", winner);
         result.put("loser", loser);
         result.put("reason", "Timer ran out");
-        //result.put("reason", mapReasonToText(reason));
 
         return result;
     }
-/*
-    private String mapReasonToText(String reasonCode) {
-        return switch (reasonCode) {
-            case "time" -> "Timer ran out";
-            case "winConditionMet" -> "Win condition met!";
-            case "movie already used" -> "Movie already used";
-            case "no valid connection" -> "No valid connection to previous movie";
-            case "connectionUsedTooManyTimes" -> "Connection used too many times";
-            default -> "Game ended";
-        };
-    }*/
+
 
 
 
@@ -219,25 +183,6 @@ public class ControllerClass {
     }
     @GetMapping("/game")
     public String showGameScreen(Model model) {
-        //update active player
-        /*if (gamePlay.getPlayer1().getIsActive()) {
-            //pass attribute back to view
-            model.addAttribute("activePlayer", gamePlay.getPlayer1().getUserName());
-            //update active status
-            gamePlay.getPlayer1().setIsActive(false);
-            gamePlay.getPlayer2().setIsActive(true);
-        } else {
-            //update active status
-            gamePlay.getPlayer2().setIsActive(false);
-            gamePlay.getPlayer1().setIsActive(true);
-        }*/
-        //update win conditoin
-        //
-        //model.addAttribute("winCondition", gamePlay.getWinCondition());
-
-        //update number of rounds
-        //
-        //model.addAttribute("roundCount", gamePlay.getRoundCount());
         return "ViewUI";
     }
 }
