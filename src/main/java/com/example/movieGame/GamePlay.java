@@ -547,7 +547,16 @@ public class GamePlay
         //Set the winCondition as what is entered in the UI
         //Define the strategy based on the entered genre
         this.winCondition = winCondition;
-        this.winStrategy = new GenreWinStrategy(winCondition);
+
+        if (winCondition.toLowerCase().startsWith("actor:")) {
+            String actorName = winCondition.substring(6).trim();  // skip "Actor:"
+            this.winStrategy = new ActorWinStrategy(actorName);
+        } else {
+            this.winStrategy = new GenreWinStrategy(winCondition);
+        }
+
+
+        //this.winStrategy = new GenreWinStrategy(winCondition);
 
     }
 

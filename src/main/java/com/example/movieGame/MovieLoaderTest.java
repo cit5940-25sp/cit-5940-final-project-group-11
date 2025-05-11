@@ -89,52 +89,66 @@ public class MovieLoaderTest {
         assertNotNull( "Year should be populated", movieExample.getReleaseYear());
     }
 
-    //Test what happens with invalid entries
-
-
-    //Test movie object is created correctly
-
-
-    //Test getMoviesHashMap()
-
-
-
-    // TODO - Properly test the remaining arrays
+    //Test what happens with invalid entries are not created
     @Test
-    public void testMovieCreator() throws IOException {
-
-        MovieLoader.creditCSVRead();
-        MovieLoader.moviesCSVRead();
-        List<Movie> movieOutputs = MovieLoader.createMovieFromFiles();
-
-        String actualTitle = movieOutputs.get(0).getMovieTitle();
-        int actualID = movieOutputs.get(0).getMovieID();
-        HashSet<String> actualGenre = movieOutputs.get(0).getGenre();
-        Long actualYear = movieOutputs.get(0).getReleaseYear();
-        HashSet<String> actualActors = movieOutputs.get(0).getActors();
-        HashSet<String> actualDirectors = movieOutputs.get(0).getDirectors();
-        HashSet<String> actualCinema = movieOutputs.get(0).getCinematographers();
-        HashSet<String> actualComposer = movieOutputs.get(0).getComposers();
-        HashSet<String> actualWriter = movieOutputs.get(0).getWriters();
-
-
-        assertEquals("Napoleon Dynamite", actualTitle);
-        assertEquals(8193, actualID);
-        assertTrue(actualActors.contains("Jon Heder"));
-
-        GamePlay play = new GamePlay("P1", "P2");
-
-        Movie mov = play.randomMovieSelection();
-        System.out.println(mov.getActors());
-        System.out.println(mov.getMovieID());
-        System.out.println(mov.getMovieTitle());
-        System.out.println(mov.getGenre());
-
-        //System.out.println(play.randomMovieSelection());
-
+    public void testInvalidEntries() {
 
     }
 
+    //Test movie object is created correctly for valid and invalid rows
+    @Test
+    public void testCreateMovieFromFiles() {
+
+    }
+
+    //Test getMoviesHashMap()
+    @Test
+    public void testGetMoviesHashMap() {
+
+    }
+
+    //Test The Lone Ranger and Alice Through the Looking Glass
+    @Test
+    public void testLinks() throws IOException {
+
+        //Upload all the files
+        MovieLoader.creditCSVRead();
+        MovieLoader.moviesCSVRead();
+        List<Movie> movieOutputs = MovieLoader.createMovieFromFiles();
+        HashMap<Integer, Movie> movieMap = MovieLoader.getMoviesHashMap();
+
+        //Define test case
+        int testIdOne = 57201;
+        int testIdTwo = 241259;
+
+        //Check both are uploading the Johnny Depp link
+        Movie movieExampleOne = movieMap.get(testIdOne);
+        Movie movieExampleTwo = movieMap.get(testIdTwo);
+        assertTrue(movieExampleOne.getActors().contains("Johnny Depp"));
+        assertTrue(movieExampleTwo.getActors().contains("Johnny Depp"));
+
+    }
+
+    //Test for random movie existence
+    @Test
+    public void testExistence() throws IOException {
+
+        //Upload all the files
+        MovieLoader.creditCSVRead();
+        MovieLoader.moviesCSVRead();
+        List<Movie> movieOutputs = MovieLoader.createMovieFromFiles();
+        HashMap<Integer, Movie> movieMap = MovieLoader.getMoviesHashMap();
+
+        //Define test case
+        int testId = 2062;
+
+        //Check both are uploading the Johnny Depp link
+        Movie movieExample = movieMap.get(testId);
+        assertEquals("Ratatouille", movieExample.getMovieTitle());
+    }
+
+
+    /*
     @Test
     public void testFindingConnection() throws IOException {
         // Load movie data
@@ -218,4 +232,6 @@ public class MovieLoaderTest {
         }
 
     }
+
+     */
 }

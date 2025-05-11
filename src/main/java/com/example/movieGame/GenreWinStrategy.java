@@ -13,6 +13,10 @@ public class GenreWinStrategy implements WinStrategy {
     @Override
     public boolean checkWin(Player player, Movie movie) {
 
+        if (movie == null || movie.getGenre() == null) {
+            return false;
+        }
+
         //Checks if the movie is the correct genre
         //Note: This is called only after the linkages is checked
         //If yes, the progress towards win counter is incremented by one
