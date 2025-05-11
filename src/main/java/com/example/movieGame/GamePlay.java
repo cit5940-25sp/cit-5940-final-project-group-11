@@ -239,9 +239,24 @@ public class GamePlay
         // First validate the move
         MoveResult result = validateMove(movie);
 
+
+        // invalid move, with overused connections
         if (!result.isValid()) {
+            // If the error is "Connection made too many times", store the overused connections
+            // for display in the UI
+            if ("Connection made too many times".equals(result.getErrorMessage()) &&
+                    !result.getOverusedConnections().isEmpty()) {
+                if (movie.getLinksToPreviousMovie() == null) {
+                    movie.linksToPreviousMovie = new ArrayList<>();
+                } else {
+                    movie.linksToPreviousMovie.clear();
+                }
+                // Store the overused connections for UI display
+                movie.linksToPreviousMovie.addAll(result.getOverusedConnections());
+            }
             return result.getErrorMessage(); // Return the error from validation
         }
+
 
         // Move is valid, process it
         if (!result.getConnections().isEmpty()) {
@@ -347,16 +362,25 @@ public class GamePlay
             return MoveResult.failure("No previous movie to connect to");
         }
 
-        // We'll collect all valid connections
+        // We'll collect all valid connections AND overused connections
         List<SingleConnection> validConnections = new ArrayList<>();
+        List<SingleConnection> overusedConnections = new ArrayList<>();
+
+        boolean foundAnyConnection = false;
+        //boolean foundOverusedConnection = false;
+
 
         // Check actors
         for (String actor : previousMovie.getActors()) {
             if (movie.getActors().contains(actor)) {
+
+                foundAnyConnection = true;
                 int usage = actorUsage.getOrDefault(actor, 0);
                 if (usage < 3) {
                     // Found a valid actor connection that hasn't been used 3 times
                     validConnections.add(new SingleConnection("Actor", actor));
+                } else {
+                    overusedConnections.add(new SingleConnection("Actor", actor, true));
                 }
             }
         }
@@ -364,9 +388,12 @@ public class GamePlay
         // Check directors
         for (String director : previousMovie.getDirectors()) {
             if (movie.getDirectors().contains(director)) {
+                foundAnyConnection = true;
                 int usage = directorUsage.getOrDefault(director, 0);
                 if (usage < 3) {
                     validConnections.add(new SingleConnection("Director", director));
+                } else {
+                    overusedConnections.add(new SingleConnection("Director", director,true));
                 }
             }
         }
@@ -374,9 +401,12 @@ public class GamePlay
         // Check writers
         for (String writer : previousMovie.getWriters()) {
             if (movie.getWriters().contains(writer)) {
+                foundAnyConnection = true;
                 int usage = writerUsage.getOrDefault(writer, 0);
                 if (usage < 3) {
                     validConnections.add(new SingleConnection("Writer", writer));
+                } else {
+                    overusedConnections.add(new SingleConnection("Writer", writer,true));
                 }
             }
         }
@@ -384,9 +414,13 @@ public class GamePlay
         // Check cinematographers
         for (String cinematographer : previousMovie.getCinematographers()) {
             if (movie.getCinematographers().contains(cinematographer)) {
+
+                foundAnyConnection = true;
                 int usage = cinematographerUsage.getOrDefault(cinematographer, 0);
                 if (usage < 3) {
                     validConnections.add(new SingleConnection("Cinematographer", cinematographer));
+                } else {
+                    overusedConnections.add(new SingleConnection("Cinematographer", cinematographer,true));
                 }
             }
         }
@@ -394,20 +428,37 @@ public class GamePlay
         // Check composers
         for (String composer : previousMovie.getComposers()) {
             if (movie.getComposers().contains(composer)) {
+
+                foundAnyConnection = true;
                 int usage = composerUsage.getOrDefault(composer, 0);
                 if (usage < 3) {
                     validConnections.add(new SingleConnection("Composer", composer));
+                } else {
+                    overusedConnections.add(new SingleConnection("Composer", composer, true));
+
                 }
             }
         }
 
         // If we didn't find any valid connections
-        if (validConnections.isEmpty()) {
+        /*if (validConnections.isEmpty()) {
             return MoveResult.failure("No valid connection found between movies");
+        }*/
+
+        if (!validConnections.isEmpty()) {
+            return MoveResult.success(validConnections,overusedConnections);
         }
 
+        if (foundAnyConnection) {
+            return MoveResult.failure("Connection made too many times", overusedConnections);
+        }
+
+        return MoveResult.failure("No valid connection found between movies");
+
+
+
         // We found at least one valid connection
-        return MoveResult.success(validConnections);
+        //return MoveResult.success(validConnections);
 
 
     }
@@ -422,7 +473,25 @@ public class GamePlay
         return availableMoviesHashMap.get(movieId);
     }
 
+    private boolean checkIfContributesToWinCondition (Movie movie) {
+        String winCond = this.winCondition;
+        if (winCondition.equals("horror") && movie.getGenre().contains("Horror")) {
+            return true;
+        } else if (winCondition.equals("comedy") && movie.getGenre().contains("Comedy")) {
+            return true;
+        } else if (winCondition.equals("action") && movie.getGenre().contains("Action")) {
+            return true;
+        } else if (winCondition.equals("sciFi") &&
+                (movie.getGenre().contains("Science Fiction") || movie.getGenre().contains("Sci-Fi"))) {
+            return true;
+        } else if (winCondition.equals("drama") && movie.getGenre().contains("Drama")) {
+            return true;
+        }
 
+        return false;
+
+
+    }
 
     /**
      *
