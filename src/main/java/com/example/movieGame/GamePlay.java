@@ -267,31 +267,36 @@ public class GamePlay
                 movie.linksToPreviousMovie.clear(); // Clear any existing connections
             }
 
-            // Choose one connection to update usage counters
-            // In the game, we only need one valid connection, even though we display all
-            SingleConnection primaryConnection = result.getConnections().get(0);
+
+           // SingleConnection primaryConnection = result.getConnections().get(0);
 
             // Update the appropriate usage counter for the primary connection
-            String type = primaryConnection.getConnectionType();
-            String name = primaryConnection.getName();
 
-            switch (type) {
-                case "Actor":
-                    actorUsage.put(name, actorUsage.getOrDefault(name, 0) + 1);
-                    break;
-                case "Director":
-                    directorUsage.put(name, directorUsage.getOrDefault(name, 0) + 1);
-                    break;
-                case "Writer":
-                    writerUsage.put(name, writerUsage.getOrDefault(name, 0) + 1);
-                    break;
-                case "Cinematographer":
-                    cinematographerUsage.put(name, cinematographerUsage.getOrDefault(name, 0) + 1);
-                    break;
-                case "Composer":
-                    composerUsage.put(name, composerUsage.getOrDefault(name, 0) + 1);
-                    break;
+            for (SingleConnection connection : result.getConnections()) {
+                String type = connection.getConnectionType();
+                String name = connection.getName();
+
+                switch (type) {
+                    case "Actor":
+                        actorUsage.put(name, actorUsage.getOrDefault(name, 0) + 1);
+                        break;
+                    case "Director":
+                        directorUsage.put(name, directorUsage.getOrDefault(name, 0) + 1);
+                        break;
+                    case "Writer":
+                        writerUsage.put(name, writerUsage.getOrDefault(name, 0) + 1);
+                        break;
+                    case "Cinematographer":
+                        cinematographerUsage.put(name, cinematographerUsage.getOrDefault(name, 0) + 1);
+                        break;
+                    case "Composer":
+                        composerUsage.put(name, composerUsage.getOrDefault(name, 0) + 1);
+                        break;
+                }
             }
+
+
+
 
             // Store all valid connections for display
             movie.linksToPreviousMovie.addAll(result.getConnections());
