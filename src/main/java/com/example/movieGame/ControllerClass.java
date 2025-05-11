@@ -6,9 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 //TODO delete this line - update just for the sake of github updating
 
@@ -114,21 +112,70 @@ public class ControllerClass {
     @PostMapping("/submitMovie")
     @ResponseBody
 
-    public String handleMovieSubmission(@RequestParam("movieId") int movieId, HttpSession session) {
+    public Map<String, Object> handleMovieSubmission(@RequestParam("movieId") int movieId, HttpSession session) {
+
+        Map<String, Object> response = new HashMap<>();
 
         GamePlay gamePlay = (GamePlay) session.getAttribute("gamePlay");
         if (gamePlay == null) {
-            return "No active game";
+            response.put("status", "error");
+            response.put("message","No Active Game");
+
+
+
+
+            return response;
         }
 
         //find the object using the movieID
-        Movie selectedMovie = gamePlay.findTermById(movieId); // You’ll need to implement this
+        Movie selectedMovie = gamePlay.findTermById(movieId);
         String errorType = "";
         errorType = gamePlay.userEntry(selectedMovie);
 
         if (selectedMovie == null) {
-            return "Movie not found";
+            response.put("status", "error");
+            response.put("message","Movie Not Found");
+            return response;
         }
+
+        String result = gamePlay.userEntry(selectedMovie);
+
+        if (result.equals("Win condition met")) {
+            response.put("status", "win");
+            response.put("winner", gamePlay.getActivePlayerName());
+            return response;
+        } else if (!result.equals("Valid User Entry")) {
+            response.put("status", "error");
+            response.put("message", result);
+            return response;
+        }
+
+        // If successful, return updated game state
+        response.put("status", "success");
+        response.put("activePlayer", gamePlay.getActivePlayerName());
+        response.put("player1Progress", gamePlay.getPlayer1().getProgressTowardWin());
+        response.put("player2Progress", gamePlay.getPlayer2().getProgressTowardWin());
+
+        // Include the movie that was just played
+        Map<String, Object> movieData = new HashMap<>();
+        movieData.put("title", selectedMovie.getMovieTitle());
+        movieData.put("releaseYear", selectedMovie.getReleaseYear());
+        movieData.put("genre", new ArrayList<>(selectedMovie.getGenre()));
+
+        // Include connections
+        List<Map<String, String>> connections = new ArrayList<>();
+        if (selectedMovie.getLinksToPreviousMovie() != null) {
+            for (SingleConnection connection : selectedMovie.getLinksToPreviousMovie()) {
+                Map<String, String> connectionData = new HashMap<>();
+                connectionData.put("type", connection.getConnectionType());
+                connectionData.put("name", connection.getName());
+                connections.add(connectionData);
+            }
+        }
+        movieData.put("connections", connections);
+        response.put("submittedMovie", movieData);
+
+        return response;
 
         //TODO add game update logic as well
         //TODO add logic to handle the errors (errorType) correctly and flow them through to the endGame page
@@ -151,7 +198,10 @@ public class ControllerClass {
         // if not a valid connection, allow a new choice
         //
 
-        return "OK";
+
+
+
+        //return "OK";
     }
 
 
@@ -168,8 +218,8 @@ public class ControllerClass {
                 .limit(8)
                 .map(term -> {
                     Map<String, String> map = new HashMap<>();
-                    map.put("id", String.valueOf(term.getWeight()));  // assuming ITerm has getId()
-                    map.put("term", term.getTerm());
+                    map.put("id", String.valueOf(term.getWeight()));  // Movie ID is stored as the weight
+                    map.put("term", term.getTerm());  // Movie title
                     return map;
                 })
                 .toList();
@@ -181,9 +231,35 @@ public class ControllerClass {
     @GetMapping("/gamestate")
     @ResponseBody
     public GamePlay getGameState(HttpSession session) {
-        GamePlay gamePlay = (GamePlay) session.getAttribute("gamePlay");
-        return gamePlay;  // assuming GamePlay has getters for player1/player2
+        return (GamePlay) session.getAttribute("gamePlay");
     }
+
+   /* @GetMapping("/gamestate")
+    @ResponseBody
+    public Map<String, Object> getGameState(HttpSession session) {
+        GamePlay gamePlay = (GamePlay) session.getAttribute("gamePlay");
+        Map<String, Object> state = new HashMap<>();
+
+        if (gamePlay == null) {
+            state.put("status", "error");
+            state.put("message", "No active game");
+            return state;
+        }
+
+        // Match the property names with what the UI expects
+        state.put("activePlayerName", gamePlay.getActivePlayerName());
+        state.put("numberOfRounds", gamePlay.getNumberOfRounds());
+        state.put("winCondition", gamePlay.getWinCondition());
+
+        state.put("player1", gamePlay.getPlayer1());
+        state.put("player2", gamePlay.getPlayer2());
+
+        state.put("firstMovie", gamePlay.getFirstMovie());
+        state.put("lastFiveMovies", new ArrayList<>(gamePlay.lastFiveMovies));
+
+        return state;
+    }*/
+
     @GetMapping("/game")
     public String showGameScreen(Model model) {
         //update active player

@@ -40,6 +40,8 @@ public class GamePlay
     private Movie firstMovie; //first randomly selected movie
     private String winCondition; //TODO move this to Win class once it's set up
 
+    private int winThreshold = 4;
+
 
 
 
@@ -195,6 +197,10 @@ public class GamePlay
     }
 
     //Checks whether the movie entered has a valid linkage
+    public Movie findById(int movieID) {
+        return availableMovies.get(movieID);
+    }
+
     public boolean checkValidLinkage(Movie movie) {
 
         //If the movie entered is the first movie, no valid linkage required
@@ -302,6 +308,18 @@ public class GamePlay
             lastFiveMovies.poll();
         }
 
+        Player activePlayer = getActivePlayer();
+        boolean contributes = checkIfContributesToWinCondition(movie);
+
+        if (contributes) {
+            activePlayer.incrementProgressTowardWin();
+
+
+            if (activePlayer.getProgressTowardWin() >= winThreshold) {
+                return "Win condition met";
+            }
+        }
+
         // Switch active player
         switchActivePlayer();
 
@@ -321,6 +339,27 @@ public class GamePlay
         player2.setIsActive(!player2.getIsActive());
     }
 
+
+
+    private boolean checkIfContributesToWinCondition (Movie movie) {
+        String winCond = this.winCondition;
+        if (winCondition.equals("horror") && movie.getGenre().contains("Horror")) {
+            return true;
+        } else if (winCondition.equals("comedy") && movie.getGenre().contains("Comedy")) {
+            return true;
+        } else if (winCondition.equals("action") && movie.getGenre().contains("Action")) {
+            return true;
+        } else if (winCondition.equals("sciFi") &&
+                (movie.getGenre().contains("Science Fiction") || movie.getGenre().contains("Sci-Fi"))) {
+            return true;
+        } else if (winCondition.equals("drama") && movie.getGenre().contains("Drama")) {
+            return true;
+        }
+
+        return false;
+
+
+    }
 
     public MoveResult validateMove(Movie movie) {
 

@@ -126,13 +126,17 @@
             padding: 8px;
             cursor: pointer;
         }
+        .active-player {
+            background-color: #d1e7dd;
+            border: 2px solid #198754;
+        }
     </style>
 
     <script>
         let selectedWinCondition = "";
 
         function showScreen(id) {
-            ['initialScreen', 'setupScreen', 'gameScreen'].forEach(screenId => {
+            ['initialScreen', 'setupScreen', 'gameScreen', 'resultScreen'].forEach(screenId => {
                 document.getElementById(screenId).classList.remove('visible');
             });
             document.getElementById(id).classList.add('visible');
@@ -142,18 +146,53 @@
             fetch('/gamestate')
                 .then(res => res.json())
                 .then(data => {
-                    document.getElementById("activePlayer").textContent = data.activePlayerName;
-                    document.getElementById("roundCount").textContent = data.numberOfRounds;
+                    console.log("Game state:", data);  // Log the data to see its structure
 
-                    // Set player name boxes
-                    document.getElementById("player1Box").textContent = data.player1.userName;
-                    document.getElementById("player2Box").textContent = data.player2.userName;
+                    console.log("Player1: ", data.player1);
+                    console.log("Player2: ", data.player2);
+                    console.log("First movie:", data.firstMovie);
+                    if (data.firstMovie) {
+                        document.getElementById("movieTitle").textContent = data.firstMovie.title || "N/A";
+                    document.getElementById("releaseYear").textContent = data.firstMovie.releaseYear || "N/A";
+                    document.getElementById("genreList").textContent =
+                        Array.isArray(data.firstMovie.genre) ?
+                        Array.from(data.firstMovie.genre).join(', ') : "N/A";
+                    }
 
-                    //set player progress towards win
-                    document.getElementById("player1ProgressTowardsWin").textContent = data.player1.progressTowardWin;
-                    document.getElementById("player2ProgressTowardsWin").textContent = data.player2.progressTowardWin;
+                    // Debug last five movies
+                    console.log("Last five movies:", data.lastFiveMovies);
 
-                    //document.getElementById("winConditionDisplay").textContent = data.winCondition;  //TODO update after winCondition is moved to win class
+                    // Debug movies used
+                    console.log("Movies used:", data.moviesUsed);
+                    console.log("======================================");
+
+
+                    // Update basic game info
+                    document.getElementById("activePlayer").textContent = data.activePlayerName || "Unknown";
+                    document.getElementById("roundCount").textContent = data.numberOfRounds || "0";
+
+                    // Update player names and progress
+                    if (data.player1) {
+                        document.getElementById("player1Box").textContent = data.player1.userName || "Player 1";
+                        document.getElementById("player1ProgressTowardsWin").textContent =
+                            data.player1.progressTowardWin || "0";
+
+                        // Highlight active player
+                        document.getElementById("player1Box").classList.toggle("active-player",
+                            data.player1.isActive === true);
+                    }
+
+                    if (data.player2) {
+                        document.getElementById("player2Box").textContent = data.player2.userName || "Player 2";
+                        document.getElementById("player2ProgressTowardsWin").textContent =
+                            data.player2.progressTowardWin || "0";
+
+                        // Highlight active player
+                        document.getElementById("player2Box").classList.toggle("active-player",
+                            data.player2.isActive === true);
+                    }
+
+                    // Update win condition
                     const winConditionMap = {
                         horror: "4 Horror Movies",
                         comedy: "4 Comedies",
@@ -164,21 +203,56 @@
                     const readableWinCondition = winConditionMap[data.winCondition] || data.winCondition;
                     document.getElementById("winConditionDisplay").textContent = readableWinCondition;
 
+                    // Display first movie
+                    if (data.firstMovie) {
+                        document.getElementById("movieTitle").textContent = data.firstMovie.movieTitle || "N/A";
+                        document.getElementById("releaseYear").textContent = data.firstMovie.releaseYear || "N/A";
+                        document.getElementById("genreList").textContent =
+                            Array.isArray(data.firstMovie.genre) ?
+                            Array.from(data.firstMovie.genre).join(', ') : "N/A";
+                    }
 
-                    //Set first movie
-                    const movie = data.firstMovie;
-                    document.getElementById("movieTitle").textContent = data.firstMovie.movieTitle;
-                    document.getElementById("releaseYear").textContent = data.firstMovie.releaseYear;
-                    document.getElementById("genreList").textContent = Array.from(movie.genre).join(', ');
-/*
-                    if (movie.linksToPreviousMovie && movie.linksToPreviousMovie.length > 0) {
-                        const formattedLinks = movie.linksToPreviousMovie.map(link =>
-                            `${link.linkType}: ${link.sharedDetail}`
-                        ).join(' | ');
-                        document.getElementById("linkToPrevious").textContent = formattedLinks;
-                    } else {
-                        document.getElementById("linkToPrevious").textContent = "None";
-                    }*/
+                    // Display recent movies (if available)
+                    if (data.lastFiveMovies && data.lastFiveMovies.length > 0) {
+                        let movies = [...data.lastFiveMovies]; // Copy the array to avoid modifying the original
+
+                        // Process and display each movie
+                        for (let i = 0; i < Math.min(movies.length, 5); i++) {
+                            const movie = movies[i];
+                            const displayNum = i + 1;
+
+                            document.getElementById(`movieTitle${displayNum}`).textContent =
+                                movie.movieTitle || "N/A";
+                            document.getElementById(`releaseYear${displayNum}`).textContent =
+                                movie.releaseYear || "N/A";
+                            document.getElementById(`genreList${displayNum}`).textContent =
+                                Array.isArray(movie.genre) ?
+                                Array.from(movie.genre).join(', ') : "N/A";
+
+                            // Display connections if available
+                            const connectionsElement = document.getElementById(`linkToPrevious${displayNum}`);
+                            if (movie.linksToPreviousMovie && movie.linksToPreviousMovie.length > 0) {
+                                const connections = movie.linksToPreviousMovie.map(link =>
+                                    `${link.connectionType}: ${link.name}`
+                                ).join(' | ');
+                                connectionsElement.textContent = connections || "None";
+                            } else {
+                                connectionsElement.textContent = "None";
+                            }
+                        }
+
+                        // Clear any unused movie displays
+                        for (let i = movies.length; i < 5; i++) {
+                            const displayNum = i + 1;
+                            document.getElementById(`movieTitle${displayNum}`).textContent = "N/A";
+                            document.getElementById(`releaseYear${displayNum}`).textContent = "N/A";
+                            document.getElementById(`genreList${displayNum}`).textContent = "N/A";
+                            document.getElementById(`linkToPrevious${displayNum}`).textContent = "N/A";
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading game state:", error);
                 });
         }
 
@@ -189,7 +263,7 @@
         }
 
         function submitSetup() {
-            const player1 = document.getElementById("player1Name").value;  //this stores the name the user types in Player#1 input field
+            const player1 = document.getElementById("player1Name").value;
             const player2 = document.getElementById("player2Name").value;
 
             if (!player1 || !player2 || !selectedWinCondition) {
@@ -210,6 +284,54 @@
                         alert("There was an error. Please try again.");
                     }
                 });
+        }
+
+        // Global variable to store current suggestions
+        let currentSuggestions = [];
+
+        // Function to submit a movie by ID
+        function submitMovie(movieId) {
+            fetch("/submitMovie", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `movieId=${encodeURIComponent(movieId)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Clear input field and suggestions
+                document.getElementById("movieInput").value = "";
+                document.getElementById("autocomplete-list").innerHTML = "";
+
+                // Check for errors
+                if (data.status === "error") {
+                    alert("Error: " + data.message);
+                    return;
+                }
+
+                // Check for win condition
+                if (data.status === "win") {
+                    document.getElementById("winnerName").textContent = data.winner;
+                    document.getElementById("loserName").textContent =
+                        data.winner === document.getElementById("player1Box").textContent ?
+                        document.getElementById("player2Box").textContent :
+                        document.getElementById("player1Box").textContent;
+                    document.getElementById("loseReason").textContent = "Win condition met";
+                    showScreen("resultScreen");
+                    return;
+                }
+
+                // Reload game state to update UI
+                loadGameData();
+
+                // Reset timer for next player
+                startTimer();
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("There was an error submitting your movie. Please try again.");
+            });
         }
     </script>
 </head>
@@ -239,7 +361,7 @@
         <!-- Right Side: Player Name -->
         <div class="section">
             <h2>Enter the name of Player #1:</h2>
-            <input type="text" id="player1Name" placeholder="Player 1 Name" />  <!-- Sam -->
+            <input type="text" id="player1Name" placeholder="Player 1 Name" />
             <h2>Enter the name of Player #2:</h2>
             <input type="text" id="player2Name" placeholder="Player 2 Name" />
 
@@ -253,15 +375,11 @@
     </div>
 </div>
 
-
-
 <!-- Game Screen -->
 <div id="gameScreen" class="screen">
     <div class="game-top-bar">
         <div class="game-info-left">
             <p><b>Active Player:</b> <span id="activePlayer">Loading...</span></p>
-            <!--<p><b>Active Player:</b> <span id="activePlayer" th:text="${activePlayer}">player1</span></p> -->
-            <!--  <p><b>Active Player:</b> <span id="activePlayer">player1</span></p>  -->
             <p><b>Win Condition:</b> <span id="winConditionDisplay">[Win Condition]</span></p>
             <p><b>Rounds Played:</b> <span id="roundCount">error</span></p>
         </div>
@@ -285,49 +403,53 @@
     </div>
 
     <div class="game-scrollable">
-    <div class="game-middle">
-        <div class="player-name player1-name" id="player1Box">Player 1</div>
-        <div class="player-name player1-progress" id="player1ProgressTowardsWin">##</div>
-        <div class="movie-stack">
-            <!-- This can be generated dynamically with JS -->
-            <div class="movie-box" id="movieDisplay">
-                <strong>Title:</strong> <span id="movieTitle">...</span><br>
-                <strong>Release Year:</strong> <span id="releaseYear">...</span><br>
-                <strong>Genre:</strong> <span id="genreList">...</span><br>
-                <strong>Link to previous:</strong> <span id="linkToPrevious">n/a</span>
+        <div class="game-middle">
+            <div class="player-name player1-name" id="player1Box">Player 1</div>
+            <div class="player-name player1-progress" id="player1ProgressTowardsWin">##</div>
+            <div class="movie-stack">
+                <!-- This can be generated dynamically with JS -->
+                <div class="movie-box" id="movieDisplay">
+                    <strong>Title:</strong> <span id="movieTitle">...</span><br>
+                    <strong>Release Year:</strong> <span id="releaseYear">...</span><br>
+                    <strong>Genre:</strong> <span id="genreList">...</span><br>
+                    <strong>Link to previous:</strong> <span id="linkToPrevious">n/a</span>
+                </div>
+                <div class="movie-box" id="movieDisplay1">
+                    <strong>Title:</strong> <span id="movieTitle1">n/a</span><br>
+                    <strong>Release Year:</strong> <span id="releaseYear1">n/a</span><br>
+                    <strong>Genre:</strong> <span id="genreList1">n/a</span><br>
+                    <strong>Link to previous:</strong> <span id="linkToPrevious1">n/a</span>
+                </div>
+                <div class="movie-box" id="movieDisplay2">
+                    <strong>Title:</strong> <span id="movieTitle2">n/a</span><br>
+                    <strong>Release Year:</strong> <span id="releaseYear2">n/a</span><br>
+                    <strong>Genre:</strong> <span id="genreList2">n/a</span><br>
+                    <strong>Link to previous:</strong> <span id="linkToPrevious2">n/a</span>
+                </div>
+                <div class="movie-box" id="movieDisplay3">
+                    <strong>Title:</strong> <span id="movieTitle3">n/a</span><br>
+                    <strong>Release Year:</strong> <span id="releaseYear3">n/a</span><br>
+                    <strong>Genre:</strong> <span id="genreList3">n/a</span><br>
+                    <strong>Link to previous:</strong> <span id="linkToPrevious3">n/a</span>
+                </div>
+                <div class="movie-box" id="movieDisplay4">
+                    <strong>Title:</strong> <span id="movieTitle4">n/a</span><br>
+                    <strong>Release Year:</strong> <span id="releaseYear4">n/a</span><br>
+                    <strong>Genre:</strong> <span id="genreList4">n/a</span><br>
+                    <strong>Link to previous:</strong> <span id="linkToPrevious4">n/a</span>
+                </div>
+                <div class="movie-box" id="movieDisplay5">
+                    <strong>Title:</strong> <span id="movieTitle5">n/a</span><br>
+                    <strong>Release Year:</strong> <span id="releaseYear5">n/a</span><br>
+                    <strong>Genre:</strong> <span id="genreList5">n/a</span><br>
+                    <strong>Link to previous:</strong> <span id="linkToPrevious5">n/a</span>
+                </div>
             </div>
-            <div class="movie-box" id="movieDisplay2">
-                <strong>Title:</strong> <span id="movieTitle2">n/a</span><br>
-                <strong>Release Year:</strong> <span id="releaseYear2">n/a</span><br>
-                <strong>Genre:</strong> <span id="genreList2">n/a</span><br>
-                <strong>Link to previous:</strong> <span id="linkToPrevious2">n/a</span>
-            </div>
-            <div class="movie-box" id="movieDisplay3">
-                <strong>Title:</strong> <span id="movieTitle3">n/a</span><br>
-                <strong>Release Year:</strong> <span id="releaseYear3">n/a</span><br>
-                <strong>Genre:</strong> <span id="genreList3">n/a</span><br>
-                <strong>Link to previous:</strong> <span id="linkToPrevious3">n/a</span>
-            </div>
-            <div class="movie-box" id="movieDisplay4">
-                <strong>Title:</strong> <span id="movieTitle4">n/a</span><br>
-                <strong>Release Year:</strong> <span id="releaseYear4">n/a</span><br>
-                <strong>Genre:</strong> <span id="genreList4">n/a</span><br>
-                <strong>Link to previous:</strong> <span id="linkToPrevious4">n/a</span>
-            </div>
-            <div class="movie-box" id="movieDisplay5">
-                <strong>Title:</strong> <span id="movieTitle5">n/a</span><br>
-                <strong>Release Year:</strong> <span id="releaseYear5">n/a</span><br>
-                <strong>Genre:</strong> <span id="genreList5">n/a</span><br>
-                <strong>Link to previous:</strong> <span id="linkToPrevious5">n/a</span>
-            </div>
+            <div class="player-name player2-name" id="player2Box">Player 2</div>
+            <div class="player-name player2-progress" id="player2ProgressTowardsWin">##</div>
         </div>
-        <div class="player-name player2-name" id="player2Box">Player 2</div>
-        <div class="player-name player2-progress" id="player2ProgressTowardsWin">##</div>
-    </div>
     </div>
 </div>
-
-
 
 <!-- Result Screen -->
 <div id="resultScreen" class="screen">
@@ -338,16 +460,14 @@
     <button onclick="showScreen('initialScreen')">Back to Start</button>
 </div>
 
-
-
-<!-- Timer -->
+<!-- Timer Script -->
 <script>
-    let timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
+    let timeLeft = 3000;  // TODO set this back to 30 (only increased so that it wouldn't interfere with testing)
     let timerInterval;
 
     function startTimer() {
         const timerDisplay = document.getElementById("timer");
-        timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
+        timeLeft = 3000;  // TODO set this back to 30 (only increased so that it wouldn't interfere with testing)
         timerDisplay.textContent = timeLeft;
 
         clearInterval(timerInterval); // Clear any existing interval first
@@ -397,52 +517,33 @@
     gameScreenObserver.observe(gameScreen, { attributes: true });
 </script>
 
-
+<!-- Autocomplete Script -->
 <script>
-    let currentMovieInput = ""; // This variable holds the latest user input
-    let currentSuggestions = [];
-
     document.addEventListener("DOMContentLoaded", () => {
         const inputField = document.getElementById("movieInput");
         const suggestionBox = document.getElementById("autocomplete-list");
 
         // Handle Enter key to submit movie
-        inputField.addEventListener("keydown", function (event) {
+        inputField.addEventListener("keydown", function(event) {
             if (event.key === "Enter") {
-                event.preventDefault(); // prevent form submission if in a form
-                currentMovieInput = inputField.value.trim();
+                event.preventDefault();
+                const query = inputField.value.trim();
 
-                // Only allow submission if the input matches a suggestion
-                if (!currentSuggestions.includes(currentMovieInput)) {
+                // Find the matching suggestion with its ID
+                const matchingSuggestion = currentSuggestions.find(s => s.term === query);
+
+                if (!matchingSuggestion) {
                     alert("Please select a movie from the dropdown list.");
                     return;
                 }
 
-                submitMovie(currentMovieInput);
-
-                if (currentMovieInput) {
-                    console.log("User submitted movie:", currentMovieInput);
-
-                    fetch("/submitMovie", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded"
-                        },
-                        body: `movie=${encodeURIComponent(currentMovieInput)}`
-                    }).then(response => {
-                        if (response.ok) {
-                            inputField.value = ""; // clear input after submission
-                            suggestionBox.innerHTML = ""; // clear suggestions too
-                        } else {
-                            alert("There was an error submitting your movie.");
-                        }
-                    });
-                }
+                // Submit using the ID
+                submitMovie(matchingSuggestion.id);
             }
         });
 
         // Handle typing for autocomplete
-        inputField.addEventListener("input", function () {
+        inputField.addEventListener("input", function() {
             const query = inputField.value.trim();
             if (!query) {
                 suggestionBox.innerHTML = "";
@@ -457,6 +558,7 @@
                     suggestions.forEach(suggestion => {
                         const div = document.createElement("div");
                         div.textContent = suggestion.term;
+                        div.setAttribute('data-id', suggestion.id);
                         div.style.padding = "8px";
                         div.style.cursor = "pointer";
                         div.addEventListener("click", () => {
@@ -469,35 +571,14 @@
                 });
         });
 
-        // Optional: hide suggestions when clicking outside
-        document.addEventListener("click", function (e) {
+        // Hide suggestions when clicking outside
+        document.addEventListener("click", function(e) {
             if (e.target !== inputField) {
                 suggestionBox.innerHTML = "";
             }
         });
-
-        function submitMovie(movieId) {
-            fetch("/submitMovie", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: `movieId=${encodeURIComponent(movieId)}`
-            }).then(response => {
-                if (response.ok) {
-                    document.getElementById("movieInput").value = "";
-                    document.getElementById("autocomplete-list").innerHTML = "";
-                } else {
-                    alert("There was an error submitting your movie.");
-                }
-            });
-        }
-
     });
 </script>
-
-
-
 
 </body>
 </html>

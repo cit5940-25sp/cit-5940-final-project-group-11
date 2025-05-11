@@ -40,6 +40,10 @@ public class Player {
         return this.progressTowardWin;
     }
 
+    public void incrementProgressTowardWin() {
+        this.progressTowardWin++;
+    }
+
     /**
      * Return whether the player is active
      *
