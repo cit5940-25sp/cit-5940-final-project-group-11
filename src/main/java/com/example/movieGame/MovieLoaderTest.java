@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 import static org.testng.AssertJUnit.*;
 
@@ -145,6 +146,14 @@ public class MovieLoaderTest {
         Movie pirates1 = movieOutputs.get(18); // Pirates of the Caribbean: The Curse of the Black Pearl
         Movie pirates2 = movieOutputs.get(38); // Pirates of the Caribbean: Dead Man's Chest
 
+        Movie interstellar = movieOutputs.get(1474); // Pirates of the Caribbean: Dead Man's Chest
+
+
+        System.out.println(interstellar);
+
+        System.out.println(pirates1);
+        System.out.println(pirates2);
+
         System.out.println("Movie 1: " + pirates1.getMovieTitle());
         System.out.println("Movie 1 actors: " + pirates1.getActors());
         System.out.println("Movie 1 directors: " + pirates1.getDirectors());
@@ -162,6 +171,8 @@ public class MovieLoaderTest {
         HashSet<String> sharedDirectors = new HashSet<>(pirates1.getDirectors());
         sharedDirectors.retainAll(pirates2.getDirectors());
         System.out.println("Shared directors: " + sharedDirectors);
+
+
 
         // Create a custom GamePlay for testing
         GamePlay play = new GamePlay("P1", "P2");
