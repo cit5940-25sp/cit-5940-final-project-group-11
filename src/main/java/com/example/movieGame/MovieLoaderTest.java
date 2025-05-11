@@ -91,7 +91,21 @@ public class MovieLoaderTest {
 
     //Test what happens with invalid entries are not created
     @Test
-    public void testInvalidEntries() {
+    public void testInvalidEntries() throws IOException {
+
+        // Load real data
+        MovieLoader.creditCSVRead();
+        MovieLoader.moviesCSVRead();
+        List<Movie> movieOutputs = MovieLoader.createMovieFromFiles();
+        List<Movie> movies = MovieLoader.createMovieFromFiles();
+
+        assertNotNull("Movies list should not be null even if some entries are invalid", movies);
+
+        for (Movie movie : movies) {
+            assertNotNull("Movie ID should not be null", movie.getMovieID());
+            assertNotNull("Movie title should not be null", movie.getMovieTitle());
+            assertNotNull("Genre should not be null", movie.getGenre());
+        }
 
     }
 
@@ -99,11 +113,30 @@ public class MovieLoaderTest {
     @Test
     public void testCreateMovieFromFiles() {
 
+
+
     }
 
     //Test getMoviesHashMap()
     @Test
-    public void testGetMoviesHashMap() {
+    public void testGetMoviesHashMap() throws IOException {
+
+        // Load files
+        MovieLoader.creditCSVRead();
+        MovieLoader.moviesCSVRead();
+        MovieLoader.createMovieFromFiles();
+        HashMap<Integer, Movie> map = MovieLoader.getMoviesHashMap();
+
+        //Check the HashMap is  not empty
+        assertNotNull("HashMap should not be null", map);
+        assertFalse("HashMap should not be empty", map.isEmpty());
+
+        // Check that a known good movie is in the map
+        int knownId = 8193;
+        assertTrue("Map should contain known movie ID", map.containsKey(knownId));
+
+        Movie movie = map.get(knownId);
+        assertEquals("Napoleon Dynamite", movie.getMovieTitle());
 
     }
 
