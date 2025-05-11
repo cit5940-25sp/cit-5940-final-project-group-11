@@ -2,12 +2,100 @@ package com.example.movieGame;
 
 import org.testng.annotations.Test;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import static org.testng.AssertJUnit.*;
 
 public class MovieLoaderTest {
+
+    //Test the method works for a specific example
+    @Test
+    public void testMovieUpload() throws IOException {
+
+        //Upload all the files
+        MovieLoader.creditCSVRead();
+        MovieLoader.moviesCSVRead();
+        List<Movie> movieOutputs = MovieLoader.createMovieFromFiles();
+
+        //Define test case
+        int testId = 8193;
+
+        //Write expected output for the test cases
+        String expectedTitle = "Napoleon Dynamite";
+        String expectedGenre = "Comedy";
+        Long expectedYear = 2004L;
+        Movie movieExample = MovieLoader.getMoviesHashMap().get(testId);
+
+        //Define assertions
+        assertEquals(expectedTitle, movieExample.getMovieTitle());
+        assertTrue(movieExample.getGenre().contains(expectedGenre));
+        assertEquals(expectedYear, movieExample.getReleaseYear());
+        assertTrue(movieExample.getActors().contains("Jon Heder"));
+        assertTrue(movieExample.getDirectors().contains("Jared Hess"));
+        assertTrue(movieExample.getCinematographers().contains("Munn Powell"));
+        assertTrue(movieExample.getWriters().contains("Jared Hess"));
+        assertTrue(movieExample.getComposers().isEmpty());
+
+    }
+
+
+    //Test that the credits CSV file is properly loaded
+    @Test
+    public void testCredits() throws IOException {
+
+        //Upload all the files
+        MovieLoader.creditCSVRead();
+        MovieLoader.moviesCSVRead();
+        List<Movie> movieOutputs = MovieLoader.createMovieFromFiles();
+        HashMap<Integer, Movie> movieMap = MovieLoader.getMoviesHashMap();
+
+        assertFalse("Movie map should not be empty after creditCSVRead()", movieMap.isEmpty());
+
+        //Define test case
+        int testId = 8193;
+
+        //Test whether populated (title, actors, directors, cinematographers, writers, composers)
+        Movie movieExample = movieMap.get(testId);
+        assertNotNull( "Actors should be populated", movieExample.getActors());
+        assertNotNull("Directors should be populated", movieExample.getDirectors());
+        assertNotNull("Titles should be populated", movieExample.getMovieTitle());
+        assertNotNull("Cinematographers should be populated", movieExample.getCinematographers());
+        assertNotNull("Writers should be populated", movieExample.getWriters());
+        assertNotNull("Composers should be populated", movieExample.getComposers());
+
+    }
+
+    //Test that the movies CSV file is properly loaded
+    @Test
+    public void testMovies() throws IOException {
+
+        //Upload all the files
+        MovieLoader.creditCSVRead();
+        MovieLoader.moviesCSVRead();
+        List<Movie> movieOutputs = MovieLoader.createMovieFromFiles();
+        HashMap<Integer, Movie> movieMap = MovieLoader.getMoviesHashMap();
+
+        assertFalse("Movie map should not be empty after movieCSVRead()", movieMap.isEmpty());
+
+        //Define test case
+        int testId = 8193;
+
+        //Test whether populated (genre, release date)
+        Movie movieExample = movieMap.get(testId);
+        assertNotNull( "Genre should be populated", movieExample.getGenre());
+        assertNotNull( "Year should be populated", movieExample.getReleaseYear());
+    }
+
+    //Test what happens with invalid entries
+
+
+    //Test movie object is created correctly
+
+
+    //Test getMoviesHashMap()
+
 
 
     // TODO - Properly test the remaining arrays
