@@ -133,9 +133,29 @@
         let winCondition = "";
 
         function showScreen(id) {
-            ['initialScreen', 'setupScreen', 'gameScreen'].forEach(screenId => {
+            ['initialScreen', 'setupScreen', 'gameScreen', 'resultScreen'].forEach(screenId => {
                 document.getElementById(screenId).classList.remove('visible');
             });
+
+            // If going back to the initial screen, clear the result screen content
+            if (id === 'initialScreen') {
+                document.getElementById("winnerName").textContent = "TBD";
+                document.getElementById("loserName").textContent = "TBD";
+                document.getElementById("loseReason").textContent = "Time ran out";
+
+                // Reset movie boxes (boxes 2-5 — movieDisplay2 through movieDisplay5)
+                for (let i = 2; i <= 5; i++) {
+                    document.getElementById("movieTitle" + i).textContent = "n/a";
+                    document.getElementById("releaseYear" + i).textContent = "n/a";
+                    document.getElementById("genreList" + i).textContent = "n/a";
+                    document.getElementById("linkToPrevious" + i).textContent = "n/a";
+                }
+
+                // Reset movie input
+                const inputField = document.getElementById("movieInput");
+                if (inputField) inputField.value = "";
+            }
+
             document.getElementById(id).classList.add('visible');
         }
 
@@ -176,15 +196,34 @@
                     document.getElementById("movieTitle").textContent = data.firstMovie.movieTitle;
                     document.getElementById("releaseYear").textContent = data.firstMovie.releaseYear;
                     document.getElementById("genreList").textContent = Array.from(movie.genre).join(', ');
-/*
-                    if (movie.linksToPreviousMovie && movie.linksToPreviousMovie.length > 0) {
-                        const formattedLinks = movie.linksToPreviousMovie.map(link =>
-                            `${link.linkType}: ${link.sharedDetail}`
-                        ).join(' | ');
-                        document.getElementById("linkToPrevious").textContent = formattedLinks;
-                    } else {
-                        document.getElementById("linkToPrevious").textContent = "None";
-                    }*/
+
+                    // Update the 5 movie boxes with lastFiveMovies
+                    const movieBoxes = [
+                        { title: "movieTitle", year: "releaseYear", genre: "genreList", link: "linkToPrevious" },
+                        { title: "movieTitle2", year: "releaseYear2", genre: "genreList2", link: "linkToPrevious2" },
+                        { title: "movieTitle3", year: "releaseYear3", genre: "genreList3", link: "linkToPrevious3" },
+                        { title: "movieTitle4", year: "releaseYear4", genre: "genreList4", link: "linkToPrevious4" },
+                        { title: "movieTitle5", year: "releaseYear5", genre: "genreList5", link: "linkToPrevious5" }
+                    ];
+
+                    [...data.lastFiveMovies].reverse().forEach((movie, index) => {
+                        if (index >= movieBoxes.length) return;
+                        const box = movieBoxes[index];
+
+                        document.getElementById(box.title).textContent = movie.movieTitle;
+                        document.getElementById(box.year).textContent = movie.releaseYear;
+                        document.getElementById(box.genre).textContent = movie.genre.join(", ");
+
+                        if (movie.linksToPreviousMovie && movie.linksToPreviousMovie.length > 0) {
+                            const formattedLinks = movie.linksToPreviousMovie.map(link =>
+                                `${link.connectionType}: ${link.name}`
+                            ).join(' | ');
+                            document.getElementById(box.link).textContent = formattedLinks;
+                        } else {
+                            document.getElementById(box.link).textContent = "None";
+                        }
+                    });
+
                 });
         }
 
