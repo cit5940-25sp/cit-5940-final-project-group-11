@@ -129,27 +129,11 @@ public class GamePlay
     public Movie randomMovieSelection() {
 
         try {
-            // Check if data is loaded; if not, load it
-            //TODO - not 100% sure, but i think that the next few lines of text are creating the full list of movies object 3 times
-            // (twice in the if statement and then once when setting up available movies)
-            // i moved the MovieLoader.creditCSVRead() and .moviesCSVRead() to the constructor, so the data gets loaded immediately
-            // i think then that the next 6 lines can all go away, if availableMovies becomes an instance variable instead and is also
-            // initialized in the constructor
-            // I made this change, and seems like it still works
-            /*if (MovieLoader.createMovieFromFiles() == null || MovieLoader.createMovieFromFiles().isEmpty()) {
-                // If data hasn't been loaded yet, load it
-                MovieLoader.creditCSVRead();
-                MovieLoader.moviesCSVRead();
-            }
-            List<Movie> availableMovies = MovieLoader.createMovieFromFiles();*/
-
-
             // check that there are movies available
             if (availableMovies.isEmpty()) {
                 System.err.println("Error: No movies available for selection");
                 return null;
             }
-
 
             // new random to select movie
             Random random = new Random();
@@ -422,8 +406,6 @@ public class GamePlay
      */
 
 
-
-    //TODO need getters/setters
 
     public Player getPlayer1() {
         return player1;

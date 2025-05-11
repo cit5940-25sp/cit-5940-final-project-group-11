@@ -22,7 +22,6 @@ public class Movie {
     private Long releaseYear;
     private HashSet<String> genre; //Updated to a set of genres
     ArrayList<SingleConnection> linksToPreviousMovie;  //list of connections to previous movie
-    // TODO - might make more sense ot store somewhere else
 
     //Constructor to create the Movie object
     public Movie(String title, int movieID, Long releaseYear, HashSet<String> genre, HashSet<String> actors, HashSet<String> directors, HashSet<String> writers,

@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//TODO delete this line - update just for the sake of github updating
 
 /**
  * tracks logic of gameplay
@@ -224,11 +223,11 @@ public class ControllerClass {
             gamePlay.getPlayer1().setIsActive(true);
         }*/
         //update win conditoin
-        //TODO
+        //
         //model.addAttribute("winCondition", gamePlay.getWinCondition());
 
         //update number of rounds
-        //TODO
+        //
         //model.addAttribute("roundCount", gamePlay.getRoundCount());
         return "ViewUI";
     }

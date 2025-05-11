@@ -136,6 +136,7 @@ public class Autocomplete implements IAutocomplete {
         currentNode = newNode;
     }
 
+    //NOTE: buildTrie is not being used. addWords is called directly from GamePlay
     @Override
     public Node buildTrie(String filename, int k) {
         try {
@@ -143,7 +144,6 @@ public class Autocomplete implements IAutocomplete {
             rootNode = new Node();
             currentNode = rootNode;
             //loop through each line in the file
-            //TODO AUTOCOMPLETE update this so that it's using/reading in the csv file and movie info
             FileInputStream fis = new FileInputStream(filename);
             BufferedReader br = new BufferedReader(new InputStreamReader(fis));
             String line = br.readLine();
