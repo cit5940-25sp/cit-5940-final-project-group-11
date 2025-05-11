@@ -1,5 +1,6 @@
 package com.example.movieGame;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -94,7 +95,11 @@ public class GamePlay
         }
 
         //randomly select movie
-        firstMovie = randomMovieSelection();
+        //firstMovie = randomMovieSelection();
+        firstMovie = moviesByTitle.get("titanic");
+        lastFiveMovies.add(firstMovie);
+        moviesUsed.add(firstMovie.getMovieID());
+
     }
 
 
