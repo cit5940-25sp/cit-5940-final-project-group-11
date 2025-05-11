@@ -89,6 +89,24 @@ public class MovieLoaderTest {
         assertNotNull( "Year should be populated", movieExample.getReleaseYear());
     }
 
+    //Test invalid entries are read in as null and create null Movie objects
+    @Test
+    public void testIncorrectFormat() throws IOException {
+
+        // Load real data
+        MovieLoader.creditCSVRead();
+        MovieLoader.moviesCSVRead();
+        MovieLoader.createMovieFromFiles();
+
+        //Define test case
+        int testId = 9;
+        Movie movieExample = MovieLoader.getMoviesHashMap().get(testId);
+
+        //Determine expected output is null for the movie object
+        assertNull(movieExample);
+
+    }
+
     //Test what happens with invalid entries are not created
     @Test
     public void testInvalidEntries() throws IOException {
@@ -106,14 +124,6 @@ public class MovieLoaderTest {
             assertNotNull("Movie title should not be null", movie.getMovieTitle());
             assertNotNull("Genre should not be null", movie.getGenre());
         }
-
-    }
-
-    //Test movie object is created correctly for valid and invalid rows
-    @Test
-    public void testCreateMovieFromFiles() {
-
-
 
     }
 
