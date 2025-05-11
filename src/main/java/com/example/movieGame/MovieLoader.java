@@ -31,6 +31,7 @@ public class MovieLoader {
         BufferedReader creditsBReader = new BufferedReader(creditsReader);
 
         //Create Hashmaps to store details
+        title = new HashMap<>();
         actorMap = new HashMap<>();
         directorMap = new HashMap<>();
         writerMap = new HashMap<>();
@@ -57,6 +58,8 @@ public class MovieLoader {
             //Get the column that contains the cast and crew JSON strings
             int id = Integer.parseInt(fields[0].trim());
             idSet.add(id);
+            String titleString = fields[1].trim();
+            title.put(id, titleString);
             String castString = fields[2].trim();
             String crewString = fields[3].trim();
 
@@ -89,7 +92,7 @@ public class MovieLoader {
                 if ("Screenplay".equals(crewMember.getString("job"))) {
                     writerNames.add(crewMember.getString("name"));
                 }
-                if ("Director of Photography".equals(crewMember.getString("job"))) {
+                if ("Cinematography".equals(crewMember.getString("job"))) {
                     cinematographerNames.add(crewMember.getString("name"));
                 }
                 if ("Original Music Composer".equals(crewMember.getString("job"))) {
@@ -117,8 +120,7 @@ public class MovieLoader {
         InputStreamReader moviesReader = new InputStreamReader(moviesStream, StandardCharsets.UTF_8);
         BufferedReader moviesBReader = new BufferedReader(moviesReader);
 
-        //Store title, year and genre
-        title = new HashMap<>();
+        //Store year and genre
         year = new HashMap<>();
         genreSet = new HashMap<>();
 
@@ -137,10 +139,8 @@ public class MovieLoader {
             rowBuilder.setLength(0);
             String[] fields = parseCsvLine(fullLine);
 
-            //Extract the id, title,  year and genre
+            //Extract the id, year and genre
             int id = Integer.parseInt(fields[1].trim());
-            String titleString = fields[2].trim();
-            title.put(id, titleString);
 
             if (!(fields[3].isEmpty())) {
                 Long rawYear = Long.valueOf(fields[3].trim().split("/")[2]);
