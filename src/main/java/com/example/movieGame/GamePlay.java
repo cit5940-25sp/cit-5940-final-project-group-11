@@ -450,6 +450,9 @@ public class GamePlay
     public Autocomplete getAutocomplete() {
         return autocomplete;
     }
+    public Queue<Movie> getLastFiveMovies() {
+        return lastFiveMovies;
+    }
 
     //TODO move this to win class once created and update UI accordingly
     public String getWinCondition() {
