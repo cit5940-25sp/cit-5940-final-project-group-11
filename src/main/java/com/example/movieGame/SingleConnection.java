@@ -36,6 +36,6 @@ public class SingleConnection {
 
     @Override
     public String toString() {
-        return connectionType + ": " + name + (overused ? "(overused" : "");
+        return connectionType + ": " + name + (overused ? ": overused " : "");
     }
 }

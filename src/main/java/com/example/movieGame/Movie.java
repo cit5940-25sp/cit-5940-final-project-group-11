@@ -1,5 +1,6 @@
 package com.example.movieGame;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -23,6 +24,8 @@ public class Movie {
     private HashSet<String> genre; //Updated to a set of genres
     ArrayList<SingleConnection> linksToPreviousMovie;  //list of connections to previous movie
 
+    ArrayList<SingleConnection> overloadedLinksToPreviousMovie;
+
     //Constructor to create the Movie object
     public Movie(String title, int movieID, Long releaseYear, HashSet<String> genre, HashSet<String> actors, HashSet<String> directors, HashSet<String> writers,
                  HashSet<String> cinematographers, HashSet<String> composers) {
@@ -35,6 +38,9 @@ public class Movie {
         this.writers = writers;
         this.cinematographers = cinematographers;
         this.composers = composers;
+
+        this.linksToPreviousMovie = new ArrayList<>();
+        this.overloadedLinksToPreviousMovie = new ArrayList<>();
     }
 
 
@@ -79,9 +85,17 @@ public class Movie {
     public ArrayList<SingleConnection> getLinksToPreviousMovie() {
         return linksToPreviousMovie;
     }
+    public ArrayList<SingleConnection> getOverloadedLinks() {
+        return overloadedLinksToPreviousMovie;
+    }
 
     @Override
     public String toString() {
         return this.movieTitle;
+    }
+
+
+    public void setOverloadedLinks(ArrayList<SingleConnection> overusedConnections) {
+        this.overloadedLinksToPreviousMovie = overusedConnections;
     }
 }

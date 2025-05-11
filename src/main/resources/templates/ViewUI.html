@@ -584,11 +584,21 @@
                         document.getElementById("movieErrorMessage").textContent = "";
                         loadGameData();
                         startTimer();
+                    } else if (data.reason ===  "Connection made too many times") {
+                        const formattedLinks = data.overloadedLinks.map(link =>
+                                `${link.connectionType}: ${link.name}`
+                            ).join(' | ');
+                        document.getElementById("movieInput").value = "";
+                        document.getElementById("autocomplete-list").innerHTML = "";
+                        document.getElementById("movieErrorMessage").textContent = data.reason + " " + formattedLinks;
+
+
+
+
                     } else if (
                         data.reason === "Movie already used" ||
                         data.reason === "No previous movie to connect to" ||
-                        data.reason === "No valid connection found between movies" ||
-                        data.reason === "Connection made too many times"
+                        data.reason === "No valid connection found between movies"
                     ) {
                         document.getElementById("movieInput").value = "";
                         document.getElementById("autocomplete-list").innerHTML = "";

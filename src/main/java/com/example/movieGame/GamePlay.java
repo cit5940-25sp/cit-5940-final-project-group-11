@@ -305,6 +305,7 @@ public class GamePlay
 
             // Store all valid connections for display
             movie.linksToPreviousMovie.addAll(result.getConnections());
+            movie.overloadedLinksToPreviousMovie.addAll(result.getOverusedConnections());
         }
 
         // Add movie to used list
@@ -374,7 +375,7 @@ public class GamePlay
 
         // We'll collect all valid connections AND overused connections
         List<SingleConnection> validConnections = new ArrayList<>();
-        List<SingleConnection> overusedConnections = new ArrayList<>();
+        ArrayList<SingleConnection> overusedConnections = new ArrayList<>();
 
         boolean foundAnyConnection = false;
         //boolean foundOverusedConnection = false;
@@ -454,7 +455,7 @@ public class GamePlay
         /*if (validConnections.isEmpty()) {
             return MoveResult.failure("No valid connection found between movies");
         }*/
-
+        movie.setOverloadedLinks(overusedConnections);
         if (!validConnections.isEmpty()) {
             return MoveResult.success(validConnections,overusedConnections);
         }
