@@ -22,6 +22,6 @@ public class GenreWinStrategy implements WinStrategy {
 
         //Returns true with the player wins the game
         //I.e. they have more than 5 points
-        return player.getProgressTowardWin() >= 1;
+        return player.getProgressTowardWin() >= 5;
     }
 }
