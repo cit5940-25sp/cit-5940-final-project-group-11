@@ -168,6 +168,8 @@
                     document.getElementById("releaseYear" + i).textContent = "n/a";
                     document.getElementById("genreList" + i).textContent = "n/a";
                     document.getElementById("linkToPrevious" + i).textContent = "n/a";
+                    document.getElementById("overusedLinkToPrevious" + i).textContent = "n/a"; // Add this line
+
                 }
 
                 // Reset movie input
@@ -219,11 +221,11 @@
 
                     // Update the 5 movie boxes with lastFiveMovies
                     const movieBoxes = [
-                        { title: "movieTitle", year: "releaseYear", genre: "genreList", link: "linkToPrevious" },
-                        { title: "movieTitle2", year: "releaseYear2", genre: "genreList2", link: "linkToPrevious2" },
-                        { title: "movieTitle3", year: "releaseYear3", genre: "genreList3", link: "linkToPrevious3" },
-                        { title: "movieTitle4", year: "releaseYear4", genre: "genreList4", link: "linkToPrevious4" },
-                        { title: "movieTitle5", year: "releaseYear5", genre: "genreList5", link: "linkToPrevious5" }
+                        { title: "movieTitle", year: "releaseYear", genre: "genreList", link: "linkToPrevious", overused: "overusedLinkToPrevious" },
+                        { title: "movieTitle2", year: "releaseYear2", genre: "genreList2", link: "linkToPrevious2", overused: "overusedLinkToPrevious2" },
+                        { title: "movieTitle3", year: "releaseYear3", genre: "genreList3", link: "linkToPrevious3", overused: "overusedLinkToPrevious3" },
+                        { title: "movieTitle4", year: "releaseYear4", genre: "genreList4", link: "linkToPrevious4", overused: "overusedLinkToPrevious4" },
+                        { title: "movieTitle5", year: "releaseYear5", genre: "genreList5", link: "linkToPrevious5", overused: "overusedLinkToPrevious5" }
                     ];
 
                     [...data.lastFiveMovies].reverse().forEach((movie, index) => {
@@ -239,9 +241,24 @@
                                 `${link.connectionType}: ${link.name}`
                             ).join(' | ');
                             document.getElementById(box.link).textContent = formattedLinks;
+
                         } else {
                             document.getElementById(box.link).textContent = "None";
                         }
+
+                        if (movie.overloadedLinks && movie.overloadedLinks.length > 0) {
+
+                            console.log(`Found overloadedLinks in movie ${movie.movieTitle}:`, movie.overloadedLinks);
+
+                            const uniqueLinks = Array.from(new Set(movie.overloadedLinks.map(link =>
+                                `${link.connectionType}: ${link.name}`
+                            )));
+                            const formattedOverusedLinks = uniqueLinks.join(' | ');
+                            document.getElementById(box.overused).textContent = formattedOverusedLinks;
+                        } else {
+                            document.getElementById(box.overused).textContent = "None";
+                        }
+
                     });
 
                 });
@@ -380,30 +397,40 @@
                 <strong>Release Year:</strong> <span id="releaseYear">...</span><br>
                 <strong>Genre:</strong> <span id="genreList">...</span><br>
                 <strong>Link to previous:</strong> <span id="linkToPrevious">n/a</span>
+                <strong>Overused links:</strong> <span id="overusedLinkToPrevious">n/a</span>
+
             </div>
             <div class="movie-box" id="movieDisplay2">
                 <strong>Title:</strong> <span id="movieTitle2">n/a</span><br>
                 <strong>Release Year:</strong> <span id="releaseYear2">n/a</span><br>
                 <strong>Genre:</strong> <span id="genreList2">n/a</span><br>
                 <strong>Link to previous:</strong> <span id="linkToPrevious2">n/a</span>
+                <strong>Overused links:</strong> <span id="overusedLinkToPrevious2">n/a</span>
+
             </div>
             <div class="movie-box" id="movieDisplay3">
                 <strong>Title:</strong> <span id="movieTitle3">n/a</span><br>
                 <strong>Release Year:</strong> <span id="releaseYear3">n/a</span><br>
                 <strong>Genre:</strong> <span id="genreList3">n/a</span><br>
                 <strong>Link to previous:</strong> <span id="linkToPrevious3">n/a</span>
+                <strong>Overused links:</strong> <span id="overusedLinkToPrevious3">n/a</span>
+
             </div>
             <div class="movie-box" id="movieDisplay4">
                 <strong>Title:</strong> <span id="movieTitle4">n/a</span><br>
                 <strong>Release Year:</strong> <span id="releaseYear4">n/a</span><br>
                 <strong>Genre:</strong> <span id="genreList4">n/a</span><br>
                 <strong>Link to previous:</strong> <span id="linkToPrevious4">n/a</span>
+                <strong>Overused links:</strong> <span id="overusedLinkToPrevious4">n/a</span>
+
             </div>
             <div class="movie-box" id="movieDisplay5">
                 <strong>Title:</strong> <span id="movieTitle5">n/a</span><br>
                 <strong>Release Year:</strong> <span id="releaseYear5">n/a</span><br>
                 <strong>Genre:</strong> <span id="genreList5">n/a</span><br>
                 <strong>Link to previous:</strong> <span id="linkToPrevious5">n/a</span>
+                <strong>Overused links:</strong> <span id="overusedLinkToPrevious5">n/a</span>
+
             </div>
         </div>
         <div class="player-name player2-name" id="player2Box">Player 2</div>
@@ -590,7 +617,7 @@
                             ).join(' | ');
                         document.getElementById("movieInput").value = "";
                         document.getElementById("autocomplete-list").innerHTML = "";
-                        document.getElementById("movieErrorMessage").textContent = data.reason + formattedLinks;
+                        document.getElementById("movieErrorMessage").textContent = data.reason + " " + formattedLinks;
 
 
 
