@@ -114,18 +114,36 @@
             top: 200px;
             right: 75px;
         }
-        .player1-progress {
+        .player1-progress-label {
             top: 250px;
+            left: 75px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .player2-progress-label {
+            top: 250px;
+            right: 75px;
+            font-size: 0.9em;
+            color: #555;
+        }
+        .player1-progress {
+            top: 280px;
             left: 75px;
         }
         .player2-progress {
-            top: 250px;
+            top: 280px;
             right: 75px;
         }
         #autocomplete-list div {
             text-align: left;
             padding: 8px;
             cursor: pointer;
+        }
+        #winCondition {
+            font-size: 0.8em;
+            padding: 0.5em;
+            width: 50%;
         }
     </style>
 
@@ -338,6 +356,7 @@
                 max-height: 320px;
                 overflow-y: auto;
             "></div>
+            <div id="movieErrorMessage" style="color: red; margin-top: 5px;"></div>
         </div>
         <div class="game-info-right">
             <p><b>Time Left:</b> <span id="timer">30</span>s</p>
@@ -347,6 +366,7 @@
     <div class="game-scrollable">
     <div class="game-middle">
         <div class="player-name player1-name" id="player1Box">Player 1</div>
+        <div class="player-name player1-progress-label">Progress towards win:</div>
         <div class="player-name player1-progress" id="player1ProgressTowardsWin">##</div>
         <div class="movie-stack">
             <!-- This can be generated dynamically with JS -->
@@ -382,6 +402,7 @@
             </div>
         </div>
         <div class="player-name player2-name" id="player2Box">Player 2</div>
+        <div class="player-name player2-progress-label">Progress towards win:</div>
         <div class="player-name player2-progress" id="player2ProgressTowardsWin">##</div>
     </div>
     </div>
@@ -394,7 +415,7 @@
     <h1>Game Over</h1>
     <p><strong>Winner:</strong> <span id="winnerName">TBD</span></p>
     <p><strong>Loser:</strong> <span id="loserName">TBD</span></p>
-    <p><strong>Reason for loss/win:</strong> <span id="loseReason">Time ran out</span></p>
+    <p><strong>Reason for losing:</strong> <span id="loseReason">Time ran out</span></p>
     <button onclick="showScreen('initialScreen')">Back to Start</button>
 </div>
 
@@ -546,24 +567,33 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.resultScreen) {
-                        clearInterval(timerInterval);  // Stop the timer to prevent it from firing again
-                        // Show result screen with game over info
+                    if (data.reason === "Win condition met") {
+                        clearInterval(timerInterval);
                         document.getElementById("winnerName").textContent = data.winner;
                         document.getElementById("loserName").textContent = data.loser;
                         document.getElementById("loseReason").textContent = data.reason;
                         showScreen("resultScreen");
                     } else if (data.message === "Valid connection") {
-                        console.log("ARGH");  // Just log to terminal
                         document.getElementById("movieInput").value = "";
                         document.getElementById("autocomplete-list").innerHTML = "";
-                        loadGameData();  // Refresh game state
-                        startTimer();  //restart timer
+                        document.getElementById("movieErrorMessage").textContent = "";
+                        loadGameData();
+                        startTimer();
+                    } else if (
+                        data.reason === "Movie already used" ||
+                        data.reason === "No previous movie to connect to" ||
+                        data.reason === "No valid connection found between movies" ||
+                        data.reason === "Connection made too many times"
+                    ) {
+                        document.getElementById("movieInput").value = "";
+                        document.getElementById("autocomplete-list").innerHTML = "";
+                        document.getElementById("movieErrorMessage").textContent = data.reason;
                     } else if (data.error) {
                         alert("Error: " + data.error);
                     } else {
                         console.warn("Unexpected response:", data);
                     }
+
                 });
         }
 
