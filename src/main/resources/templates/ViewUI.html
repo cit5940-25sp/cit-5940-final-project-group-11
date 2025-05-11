@@ -51,6 +51,7 @@
             z-index: 1;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             border-radius: 8px;
+
         }
         .game-info-left, .game-info-right {
             text-align: left;
@@ -163,6 +164,9 @@
             fetch('/gamestate')
                 .then(res => res.json())
                 .then(data => {
+
+
+
                     document.getElementById("activePlayer").textContent = data.activePlayerName;
                     document.getElementById("roundCount").textContent = data.numberOfRounds;
 
@@ -398,12 +402,12 @@
 
 <!-- Timer -->
 <script>
-    let timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
+    let timeLeft = 30;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
     let timerInterval;
 
     function startTimer() {
         const timerDisplay = document.getElementById("timer");
-        timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
+        timeLeft = 30;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
         timerDisplay.textContent = timeLeft;
 
         clearInterval(timerInterval); // Clear any existing interval first
