@@ -1,6 +1,7 @@
 package com.example.movieGame;
 
 /**
+ * Node used in the trie that is used for Autocomplete dropdown suggestions
  * @author Harry Smith
  */
 
@@ -41,34 +42,67 @@ public class Node {
         references = new Node[26];
     }
 
+    /**
+     * Getter for term
+     * @return Term
+     */
     public Term getTerm() {
         return term;
     }
 
+    /**
+     * Setter for term
+     * @param term Term
+     */
     public void setTerm(Term term) {
         this.term = term;
     }
 
+    /**
+     * Getter for words (word = 1 if Node is a word, and 0 if not a word)
+     * @return word (word = 1 if Node is a word, and 0 if not a word)
+     */
     public int getWords() {
         return words;
     }
 
+    /**
+     * Setter for words (word = 1 if Node is a word, and 0 if not a word)
+     * @param words word (word = 1 if Node is a word, and 0 if not a word)
+     */
     public void setWords(int words) {
         this.words = words;
     }
 
+    /**
+     * Getter for words (word = 1 if Node is a word, and 0 if not a word)
+     * @return prefixes
+     */
     public int getPrefixes() {
         return prefixes;
     }
 
+    /**
+     * Setter for the prefix
+     * @param prefixes prefix
+     */
     public void setPrefixes(int prefixes) {
         this.prefixes = prefixes;
     }
 
+    /**
+     * Getter for the array of node references
+     * Every Node gets an array of nodes - one for each character (255 slots)
+     * @return array of reference nodes (one step down the trie)
+     */
     public Node[] getReferences() {
         return references;
     }
 
+    /**
+     * Setter for the array of node references
+     * @param references array of reference nodes (one step down the trie)
+     */
     public void setReferences(Node[] references) {
         this.references = references;
     }

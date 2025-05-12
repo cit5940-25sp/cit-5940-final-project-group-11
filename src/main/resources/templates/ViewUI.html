@@ -156,9 +156,9 @@
     </style>
 
     <script>
-        //let selectedWinCondition = "";
         let winCondition = "";
 
+        //show the initial screen
         function showScreen(id) {
             ['initialScreen', 'setupScreen', 'gameScreen', 'resultScreen'].forEach(screenId => {
                 document.getElementById(screenId).classList.remove('visible');
@@ -188,6 +188,7 @@
             document.getElementById(id).classList.add('visible');
         }
 
+        //load the game data
         function loadGameData() {
             fetch('/gamestate')
                 .then(res => res.json())
@@ -265,14 +266,7 @@
                 });
         }
 
-        //Note this is not currently being used
-        /*function selectWinCondition(value) {
-            selectedWinCondition = value;
-            document.querySelectorAll('.win-button').forEach(btn => btn.style.backgroundColor = '');
-            document.getElementById("win-" + value).style.backgroundColor = '#d1e7dd';
-        }
-        */
-
+        //submits the setup
         function submitSetup() {
             const player1 = document.getElementById("player1Name").value;  //this stores the name the user types in Player#1 input field
             const player2 = document.getElementById("player2Name").value;
@@ -387,7 +381,7 @@
             <p><b>Time Left:</b> <span id="timer">30</span>s</p>
         </div>
     </div>
-
+    <!-- Controls the middle section with 5 movies listed -->
     <div class="game-scrollable">
     <div class="game-middle">
         <div class="player-name player1-name" id="player1Box">Player 1</div>
@@ -461,6 +455,7 @@
     let timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
     let timerInterval;
 
+    //controls the timer
     function startTimer() {
         const timerDisplay = document.getElementById("timer");
         timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
@@ -472,6 +467,7 @@
             timeLeft--;
             timerDisplay.textContent = timeLeft;
 
+            //if no time is left, display the end screen/game over screen
             if (timeLeft <= 0) {
                 clearInterval(timerInterval);
                 timerDisplay.textContent = "0"; // Ensure display shows 0
@@ -513,7 +509,7 @@
     gameScreenObserver.observe(gameScreen, { attributes: true });
 </script>
 
-
+<!-- Handles user entry -->
 <script>
     let currentMovieInput = ""; // This variable holds the latest user input
     let currentSuggestions = [];
@@ -565,6 +561,7 @@
                 return;
             }
 
+            //shows the autocomplete options wheen triggered
             fetch(`/autocomplete?query=${encodeURIComponent(query)}`)
                 .then(res => res.json())
                 .then(suggestions => {
@@ -585,13 +582,14 @@
                 });
         });
 
-        // Optional: hide suggestions when clicking outside
+        // hide suggestions when clicking outside
         document.addEventListener("click", function (e) {
             if (e.target !== inputField) {
                 suggestionBox.innerHTML = "";
             }
         });
 
+        // show different features based on the corresponding message (valid, error type, etc.)
         function submitMovie(movieId) {
             fetch("/submitMovie", {
                 method: "POST",
@@ -621,10 +619,6 @@
                         document.getElementById("movieInput").value = "";
                         document.getElementById("autocomplete-list").innerHTML = "";
                         document.getElementById("movieErrorMessage").textContent = data.reason + " " + formattedLinks;
-
-
-
-
                     } else if (
                         data.reason === "Movie already used" ||
                         data.reason === "No previous movie to connect to" ||
@@ -638,17 +632,9 @@
                     } else {
                         console.warn("Unexpected response:", data);
                     }
-
                 });
         }
-
-
-
     });
 </script>
-
-
-
-
 </body>
 </html>

@@ -8,6 +8,10 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+/**
+ * Test class for Term class
+ *
+ */
 public class TermTest {
     @Test
     public void compareTo() {

@@ -9,6 +9,10 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
+/**
+ * Test class for GamePlay class
+ *
+ */
 public class GamePlayTest {
 
 
@@ -162,7 +166,7 @@ public class GamePlayTest {
         assertTrue("Expected to find a valid connection", result.isValid());
         assertFalse("Expected to find at least one connection", result.getConnections().isEmpty());
 
-        // get actor connections from the result
+        // Collect actor connections from the result
         Set<String> actorConnectionsFound = new HashSet<>();
         Set<String> directorConnectionsFound = new HashSet<>();
         for (SingleConnection connection : result.getConnections()) {

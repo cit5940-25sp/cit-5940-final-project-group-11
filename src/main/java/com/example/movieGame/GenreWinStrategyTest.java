@@ -3,6 +3,10 @@ import org.junit.Test;
 import java.util.HashSet;
 import static org.junit.Assert.*;
 
+/**
+ * Test class for GenreWinStrategy class
+ *
+ */
 public class GenreWinStrategyTest {
 
     //Create fields to track

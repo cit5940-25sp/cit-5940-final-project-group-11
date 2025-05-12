@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 
 import static org.testng.AssertJUnit.*;
 
+/**
+ * Test class for MovieLoader class
+ *
+ */
 public class MovieLoaderTest {
 
     //Test the method works for a specific example

@@ -52,20 +52,49 @@ public interface ITerm
         };
     }
 
+    /**
+     * Compares the two terms in lexicographic order by query.
+     *
+     * @param that term object
+     * @return 1, 0, or -1 based on the comparison
+     */
     // Compares the two terms in lexicographic order by query.
     public int compareTo(ITerm that);
 
 
-    // Returns a string representation of this term in the following format:
-    // the weight, followed by a tab, followed by the query.
+    /**
+     * Returns a string representation of this term in the following format:
+     * the weight, followed by a tab, followed by the query.
+     *
+     */
     public String toString();
 
-    // Required getters.
+    /**
+     * Getter for weight
+     *
+     * @return returns the weight of the term
+     */
     public long getWeight();
+
+    /**
+     * Getter for term
+     *
+     * @return returns the term
+     */
     public String getTerm();
 
-    // Required setters (mostly for autograding purposes)
+    /**
+     * Setter for weight
+     *
+     * @param weight weight of the term
+     */
     public void setWeight(long weight);
+
+    /**
+     * Setter for term
+     *
+     * @param term term
+     */
     public String setTerm(String term);
 
 }

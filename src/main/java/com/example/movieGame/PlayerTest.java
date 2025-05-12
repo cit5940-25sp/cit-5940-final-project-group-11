@@ -4,6 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.*;
 
+/**
+ * Test class for Player class
+ *
+ */
 public class PlayerTest {
 
     //Tests that the constructor correctly creates a Player object
