@@ -80,4 +80,8 @@ public class Player {
         //increment progress toward win when player submits a successful entry
         this.progressTowardWin = this.progressTowardWin + 1;
     }
+
+    public void setProgressInt(int i) {
+        this.progressTowardWin = i;
+    }
 }

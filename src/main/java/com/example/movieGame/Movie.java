@@ -47,6 +47,16 @@ public class Movie {
     }
 
 
+
+
+    /**
+     * Setter for cinematographers
+     * @param cinematographers
+     */
+    public void setCinematographers(HashSet<String> cinematographers) {
+        this.cinematographers = cinematographers;
+    }
+
     /**
      * Getter for movie title
      * @return movie title
