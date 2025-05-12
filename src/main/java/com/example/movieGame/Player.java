@@ -1,7 +1,7 @@
 package com.example.movieGame;
 
 /**
- * main.java.com.example.movieGame.Player object to track main.java.com.example.movieGame.Player 1 and main.java.com.example.movieGame.Player 2
+ * Player object to track Player 1 and Player 2 active status, name, and progress towards win
  *
  */
 public class Player {
@@ -22,7 +22,7 @@ public class Player {
     }
 
     /**
-     * Return main.java.com.example.movieGame.Player's username
+     * Return player's username
      *
      * @return player's username
      */
@@ -58,22 +58,23 @@ public class Player {
     }
 
     /**
-     * set active player status
-     * @Parameter whether they're the active player
+     * Set active player status
+     * @param isActive whether they're the active player
      */
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
     /**
-     * set active player status
-     * @Parameter whether they're the active player
+     * Set inactive player status
+     * @param isInactive whether they're the inactive player
      */
     public void setIsInactive(boolean isInactive) {
         this.isInactive = isInactive;
     }
 
     /**
-     * set progress toward win
+     * Set progress toward win
+     * Increments progress toward win when player submits a successful entry
      */
     public void setProgressTowardWin() {
         //increment progress toward win when player submits a successful entry

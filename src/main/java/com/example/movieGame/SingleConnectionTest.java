@@ -4,6 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Test class for SingleConnection class
+ *
+ */
 public class SingleConnectionTest {
 
     //Tests that the SingleConnection object is correctly initialised

@@ -7,6 +7,10 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
+/**
+ * Test class for autocomplete dropdown selection
+ *
+ */
 public class AutocompleteTest {
     //test empty prefix
     //DONE test prefix with no results in the trie

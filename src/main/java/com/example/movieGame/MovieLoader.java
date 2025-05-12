@@ -7,6 +7,11 @@ import java.util.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Loads the data from the csv files into collections
+ * Data pulled from https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata
+ *
+ */
 public class MovieLoader {
 
 
@@ -23,6 +28,12 @@ public class MovieLoader {
     private static Map<Integer, List<String>> genreSet;
 
 
+    /**
+     * Loads in the credit csv file, stores the details in hashmaps.
+     * Then sets the cast/crew data into JSON arrays and iterates through
+     * Each type of cast/crew is added to hashmap.
+     * @throws throws IOException if there's an issue reading the file
+     */
     public static void creditCSVRead() throws IOException {
 
         //Load in the credit csv file
@@ -112,7 +123,12 @@ public class MovieLoader {
     }
 
 
-    //Note all columns have been deleted from the CSV file except for ID, title, year and genre
+    /**
+     * Loads in the movies csv file, stores the details in hashmaps.
+     * Extracts the id, year, and genre
+     *
+     * @throws throws IOException if there's an issue reading the file
+     */
     public static void moviesCSVRead() throws IOException {
 
         //Load in the movies csv file
@@ -153,11 +169,15 @@ public class MovieLoader {
                 genresList.add(genreArray.getJSONObject(j).getString("name"));
             }
             genreSet.put(id, genresList);
-
         }
-
     }
 
+    /**
+     * Parses each line of the csv and returns an array of fields (ie each column)
+     *
+     * @param line csv line
+     * @return String array of fields (ie each column)
+     */
     public static String[] parseCsvLine(String line) {
 
         List<String> result = new ArrayList<>();
@@ -186,6 +206,12 @@ public class MovieLoader {
         return result.toArray(new String[0]);
     }
 
+    /**
+     * Creates an arraylist and hashmap of Movie objects, pulled from the files
+     * This information is later used for the autocomplete functionality, and to validate connections
+     *
+     * @return returns a list of movie objects
+     */
     public static List<Movie> createMovieFromFiles() {
 
         //Initialise movies
@@ -212,15 +238,15 @@ public class MovieLoader {
 
         //Return movie object
         return movies;
-
     }
 
+    /**
+     * Getter for the movies hashmap
+     * Used to look up the corresponding movie object (based on its id) after pulling it from autocomplete
+     *
+     * @return returns the hashmap of movies objects
+     */
     public static HashMap<Integer, Movie> getMoviesHashMap() {
         return moviesHashMap;
     }
 }
-
-
-
-
-

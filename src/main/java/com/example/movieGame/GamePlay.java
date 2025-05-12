@@ -3,7 +3,12 @@ package com.example.movieGame;
 import java.io.IOException;
 import java.util.*;
 
-
+/**
+ * Handles the primary logic and actions for the game play.
+ * Selects a random movie at the beginning
+ * Each time a user submits a movie entry, it checks for valid connections, increments round count, switches the active player, etc.
+ *
+ */
 public class GamePlay
 {
     ArrayList<Integer> moviesUsed; //list of movie IDs ot track if it's been used before
@@ -21,9 +26,7 @@ public class GamePlay
     //Index Maps
     private Map<String, Movie> moviesByTitle;
 
-
     //Usage Maps
-
     private Map<String, Integer> actorUsage = new HashMap<>();      // Maps actor name to usage count
     private Map<String, Integer> directorUsage = new HashMap<>();   // Maps director name to usage count
     private Map<String, Integer> writerUsage = new HashMap<>();     // Maps writer name to usage count
@@ -99,9 +102,7 @@ public class GamePlay
         firstMovie = moviesByTitle.get("titanic");
         lastFiveMovies.add(firstMovie);
         moviesUsed.add(firstMovie.getMovieID());
-
     }
-
 
 
     // build the index here, and add each movie to autocomplete
@@ -121,8 +122,6 @@ public class GamePlay
             // to show camelCase in teh dropdown, could change weight to be a string that records the camel case title
             // and return that instead of the all lowercase version...actually that may not work...regardless,
             // think we should should leave as-is and only come back to it later if we have time
-
-
 
         }
     }
@@ -299,9 +298,6 @@ public class GamePlay
                         break;
                 }
             }
-
-
-
 
             // Store all valid connections for display
             movie.linksToPreviousMovie.addAll(result.getConnections());
@@ -543,7 +539,6 @@ public class GamePlay
 
     //TODO move this to win class once created and update UI accordingly
     public String getWinCondition() {
-
         return winCondition;
 
     }
@@ -554,7 +549,6 @@ public class GamePlay
 
     //TODO move this to win class once created and update UI accordingly
     public void setWinCondition(String winCondition) {
-
         //Set the winCondition as what is entered in the UI
         //Define the strategy based on the entered genre
         this.winCondition = winCondition;

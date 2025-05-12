@@ -6,6 +6,10 @@ import java.util.HashSet;
 
 import static org.junit.Assert.*;
 
+/**
+ * Test class for ActorWinStrategy class
+ *
+ */
 public class ActorWinStrategyTest {
 
     private Player player;

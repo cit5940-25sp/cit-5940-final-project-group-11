@@ -1,15 +1,34 @@
 package com.example.movieGame;
 
+/**
+ * Implements the WinStrategy interface
+ * Checks whether a player has won based on their selected win condition (for genre)
+ * A player wins if they name 5 movies of a particular genre
+ *
+ */
 public class GenreWinStrategy implements WinStrategy {
 
     //Keeps track of the genre entered by the player at the start
     private final String targetGenre;
 
-    //Constructor to create the preferred win strategy
+    /**
+     * Constructor to create the preferred win strategy
+     *
+     * @param targetGenre user selected genre (horror, comedy, etc.)
+     *
+     */
     public GenreWinStrategy(String targetGenre) {
         this.targetGenre = targetGenre;
     }
 
+    /**
+     * Checks to see if a player has won the game
+     * Boolean returns T if the player wins the game
+     * I.e. able to name 5 movies with the win genre
+     *
+     * @param player the player object
+     * @param movie the movie object
+     */
     @Override
     public boolean checkWin(Player player, Movie movie) {
 

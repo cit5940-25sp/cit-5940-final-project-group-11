@@ -7,13 +7,14 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
+/**
+ * Test class for GamePlay class
+ *
+ */
 public class GamePlayTest {
 
     //private GamePlay gamePlay;
     //private Movie movie1, movie2, movie3;
-
-
-
 
     @Test
     public void testRandomMovieSelection() throws IOException {
