@@ -4,6 +4,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Test class for Node class
+ *
+ */
 public class NodeTest {
     @Test
     public void getTerm() {

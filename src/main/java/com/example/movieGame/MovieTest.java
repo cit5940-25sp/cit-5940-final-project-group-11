@@ -7,6 +7,10 @@ import java.util.*;
 
 import static org.testng.Assert.*;
 
+/**
+ * Test class for Movie class
+ *
+ */
 public class MovieTest {
 
     private HashSet<String> genre = new HashSet<>();

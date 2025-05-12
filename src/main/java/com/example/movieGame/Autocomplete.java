@@ -4,22 +4,11 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implements autocomplete functionality for the User Entry movie selection.
+ * Selection options are pulled from a csv file from the Kaggle database
+ */
 public class Autocomplete implements IAutocomplete {
-    //In this part, you will implement a data type that provides autocomplete
-    // functionality for a given set of strings and corresponding weights, using Term and Node.
-    // Your Autocomplete.java class will implement a Trie data structure.
-    // Your class should keep a reference to the root Node of the Trie.
-    //
-    //Organize your program by creating a data type Autocomplete.java that implements
-    // the IAutocomplete.java interface. Most of the implementation details for Autocomplete.java
-    // are listed in the JavaDocs found in IAutocomplete.java.
-    //
-    //Some important things to keep in mind when implementing Autocomplete.java:
-    //When building your trie from a file, you should convert all strings to lowercase.
-    //Preserve encapsulation by returning copies of the Terms that you suggest instead
-    // of returning references to the Term objects that constitute your Trie.
-    //For inputs that contain special characters or prefixes that are not contained in the Trie`,
-    // do nothing and return null/0.
 
     private Node currentNode; //node for tracking which node you're on when building the Trie
     private Node rootNode; //node for tracking the root
@@ -33,6 +22,13 @@ public class Autocomplete implements IAutocomplete {
         return rootNode;
     }
 
+    /**
+     * Adds a new word with its associated weight to the Trie.
+     * If the word contains an invalid character, simply do nothing.
+     *
+     * @param word the word to be added to the Trie
+     * @param weight the weight of the word
+     */
     @Override
     public void addWord(String word, long weight) {
         //if Node is null (ex: if being called before buildTrie)
@@ -40,9 +36,6 @@ public class Autocomplete implements IAutocomplete {
         if (rootNode == null) {
             rootNode = new Node();
         }
-
-
-        // comment this out because we actually need numbers, weird chars, etc
 
         //check for special character
         boolean specialChar = false;
@@ -58,7 +51,6 @@ public class Autocomplete implements IAutocomplete {
         }
 
         word = word.toLowerCase();
-
 
         int len = word.length(); //capture length of word
         int charCounter = 1; //track which character in the word it is
@@ -115,7 +107,16 @@ public class Autocomplete implements IAutocomplete {
         }
     }
 
-    //NEW METHOD ADDED
+    /**
+     * Creates a new node and sets its prefixes, references, and words
+     * Places the node in the references array of the current node, adn updates currentNode to be the new Node created
+     *
+     * @param words integer 1 if the node is a word; 0 if the node is not a word
+     * @param weight weight of the word
+     * @param alphabetPosition integer of the ascii number corresponding to the letter
+     * @param prefixWord the prefix word itself
+     *
+     */
     private void createNewNode(int words, long weight, int alphabetPosition, String prefixWord) {
         //create new node and set Term
         Node newNode;
@@ -136,7 +137,13 @@ public class Autocomplete implements IAutocomplete {
         currentNode = newNode;
     }
 
-    //NOTE: buildTrie is not being used. addWords is called directly from GamePlay
+    /**
+     * Builds the trie
+     * NOTE: buildTrie is not being used in this implementation. addWords is called directly from GamePlay
+     *
+     * @param filename string of the file
+     * @param k integer indicating the number of top dropdown options to display
+     */
     @Override
     public Node buildTrie(String filename, int k) {
         try {
@@ -249,8 +256,13 @@ public class Autocomplete implements IAutocomplete {
         return suggestions;
     }
 
-    //NEW METHOD ADDED
+    /**
+     * A recursive function that traverses through the trie to find the list of relevant suggestions
+     *
+     * @param currNode the current Node
+     */
     private void trieTraversal(Node currNode) {
+        //NEW METHOD ADDED
         //base case
         if (currNode == null) {
             return;
@@ -281,14 +293,4 @@ public class Autocomplete implements IAutocomplete {
             }
         }
     }
-
-    public static void main(String[] args) {
-        Autocomplete autocomplete = new Autocomplete();
-        //autocomplete.addWord("test",2);
-        //autocomplete.buildTrie("file4.txt",2);
-        //autocomplete.getSuggestions("cla");
-
-
-    }
-
 }

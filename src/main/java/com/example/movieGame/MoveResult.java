@@ -3,6 +3,7 @@ package com.example.movieGame;
 import java.util.Collections;
 import java.util.List;
 
+
 public class MoveResult {
 
     private boolean isValid;
