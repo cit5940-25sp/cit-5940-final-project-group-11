@@ -95,8 +95,8 @@ public class GamePlay
         }
 
         //randomly select movie
-        //firstMovie = randomMovieSelection();
-        firstMovie = moviesByTitle.get("titanic");
+        firstMovie = randomMovieSelection();
+        //firstMovie = moviesByTitle.get("titanic");
         lastFiveMovies.add(firstMovie);
         moviesUsed.add(firstMovie.getMovieID());
 
@@ -187,7 +187,7 @@ public class GamePlay
     }
 
     //Checks whether the movie entered has a valid linkage
-    public boolean checkValidLinkage(Movie movie) {
+    /*public boolean checkValidLinkage(Movie movie) {
 
         //If the movie entered is the first movie, no valid linkage required
         if (lastFiveMovies.isEmpty())  {
@@ -218,14 +218,14 @@ public class GamePlay
             }
         }
         return false;
-    }
+    }*/
 
 
-    public Movie getMovieFromTitle(String title) {
+    /*public Movie getMovieFromTitle(String title) {
         title = title.strip().toLowerCase();
 
         return moviesByTitle.get(title);
-    }
+    }*/
 
 
 
@@ -484,7 +484,7 @@ public class GamePlay
         return availableMoviesHashMap.get(movieId);
     }
 
-    private boolean checkIfContributesToWinCondition (Movie movie) {
+   /* private boolean checkIfContributesToWinCondition (Movie movie) {
         String winCond = this.winCondition;
         if (winCondition.equals("horror") && movie.getGenre().contains("Horror")) {
             return true;
@@ -502,7 +502,7 @@ public class GamePlay
         return false;
 
 
-    }
+    }*/
 
     /**
      *
@@ -527,9 +527,9 @@ public class GamePlay
     }
 
 
-    public int getNumberOfRounds() {
+    /*public int getNumberOfRounds() {
         return numberOfRounds;
-    }
+    }*/
     public Movie getFirstMovie() {
         return firstMovie;
     }
@@ -545,6 +545,10 @@ public class GamePlay
 
         return winCondition;
 
+    }
+
+    public void setFirstMovie(Movie movie) {
+        this.firstMovie = movie;
     }
 
     //TODO move this to win class once created and update UI accordingly
