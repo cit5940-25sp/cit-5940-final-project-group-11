@@ -95,8 +95,8 @@ public class GamePlay
         }
 
         //randomly select movie
-        firstMovie = randomMovieSelection();
-        //firstMovie = moviesByTitle.get("titanic");
+        //firstMovie = randomMovieSelection();
+        firstMovie = moviesByTitle.get("titanic");
         lastFiveMovies.add(firstMovie);
         moviesUsed.add(firstMovie.getMovieID());
 
@@ -383,15 +383,24 @@ public class GamePlay
 
         // Check actors
         for (String actor : previousMovie.getActors()) {
+            //only mark as an overused/found connection if win condition is not the actor win condition
             if (movie.getActors().contains(actor)) {
-
-                foundAnyConnection = true;
-                int usage = actorUsage.getOrDefault(actor, 0);
-                if (usage < 3) {
-                    // Found a valid actor connection that hasn't been used 3 times
-                    validConnections.add(new SingleConnection("Actor", actor));
+                if (winCondition.equals("Horror") ||
+                        winCondition.equals("Action") ||
+                        winCondition.equals("Comedy") ||
+                        winCondition.equals("Science Fiction") ||
+                        winCondition.equals("Drama")) {
+                    foundAnyConnection = true;
+                    int usage = actorUsage.getOrDefault(actor, 0);
+                    if (usage < 3) {
+                        // Found a valid actor connection that hasn't been used 3 times
+                        validConnections.add(new SingleConnection("Actor", actor));
+                    } else {
+                        overusedConnections.add(new SingleConnection("Actor", actor, true));
+                    }
                 } else {
-                    overusedConnections.add(new SingleConnection("Actor", actor, true));
+                    // Found a valid actor connection (ok if it's been used >3 times, as long as win condition is actor)
+                    validConnections.add(new SingleConnection("Actor", actor));
                 }
             }
         }
@@ -461,6 +470,7 @@ public class GamePlay
         }
 
         if (foundAnyConnection) {
+
             return MoveResult.failure("Connection made too many times", overusedConnections);
         }
 
@@ -527,9 +537,9 @@ public class GamePlay
     }
 
 
-    /*public int getNumberOfRounds() {
+    public int getNumberOfRounds() {
         return numberOfRounds;
-    }*/
+    }
     public Movie getFirstMovie() {
         return firstMovie;
     }

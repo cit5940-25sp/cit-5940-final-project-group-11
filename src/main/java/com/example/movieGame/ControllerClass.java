@@ -145,7 +145,7 @@ public class ControllerClass {
         return response;
     }
 
-    public void findWinnerAndLoser(Map<String, Object> response, GamePlay gamePlay) {
+    private void findWinnerAndLoser(Map<String, Object> response, GamePlay gamePlay) {
         String active = gamePlay.getActivePlayerName();
         if (active.equals(gamePlay.getPlayer1().getUserName())) {
             response.put("winner", gamePlay.getPlayer2().getUserName());

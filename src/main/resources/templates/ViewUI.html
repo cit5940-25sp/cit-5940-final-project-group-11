@@ -29,6 +29,9 @@
         }
         .section h2 {
             margin-bottom: 0.5em;
+            min-height: 2.5em; /* Creates consistent height for headings */
+            display: flex;
+            align-items: flex-end; /* Aligns text to bottom of container */
         }
         button {
             padding: 0.5em 1em;
@@ -92,10 +95,11 @@
         .movie-stack {
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-start;
             width: 60%;
             margin: 0 auto;
             margin-top: 20px;
+            margin-left: 300px;
         }
         .movie-box {
             border: 1px solid #ccc;
@@ -140,10 +144,14 @@
             padding: 8px;
             cursor: pointer;
         }
-        #winCondition {
-            font-size: 0.8em;
-            padding: 0.5em;
+        #winCondition, #actorWinCondition, #player1Name, #player2Name {
             width: 50%;
+            padding: 0.5em;
+            box-sizing: border-box;
+            margin-bottom: 0.05em;
+        }
+        .continue-button-container {
+            margin-top: 0.05em; /* Shift down the continue button */
         }
     </style>
 
@@ -198,20 +206,13 @@
                     document.getElementById("player1ProgressTowardsWin").textContent = data.player1.progressTowardWin;
                     document.getElementById("player2ProgressTowardsWin").textContent = data.player2.progressTowardWin;
 
-                    /*
-                    //document.getElementById("winConditionDisplay").textContent = data.winCondition;
-                    const winConditionMap = {
-                        horror: "4 Horror Movies",
-                        comedy: "4 Comedies",
-                        action: "4 Action Movies",
-                        sciFi: "4 Science Fiction Movies",
-                        drama: "4 Dramas"
-                    };
-                    const readableWinCondition = winConditionMap[data.winCondition] || data.winCondition;
-                    document.getElementById("winConditionDisplay").textContent = readableWinCondition;
-                    */
-                    const genre = data.winCondition;
-                    document.getElementById("winConditionDisplay").textContent = `Name 5 ${genre} Movies`;
+                    let winConditionText = data.winCondition;
+                    // Check if it's an actor win condition
+                    if (winConditionText.startsWith("Actor: ")) {
+                        // Remove the "Actor: " prefix
+                        winConditionText = winConditionText.substring(7);
+                    }
+                    document.getElementById("winConditionDisplay").textContent = `Name 5 ${winConditionText} Movies`;
 
                     //Set first movie
                     const movie = data.firstMovie;
@@ -347,7 +348,9 @@
             <div style="margin-top: 1em;">
                 <br>
                 <br>
-                <button onclick="submitSetup()">Continue</button>
+                <div class="continue-button-container">
+                    <button onclick="submitSetup()">Continue</button>
+                </div>
             </div>
         </div>
     </div>
@@ -455,20 +458,12 @@
 
 <!-- Timer -->
 <script>
-<<<<<<< Updated upstream
     let timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
-=======
-    let timeLeft = 300;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
->>>>>>> Stashed changes
     let timerInterval;
 
     function startTimer() {
         const timerDisplay = document.getElementById("timer");
-<<<<<<< Updated upstream
         timeLeft = 3000;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
-=======
-        timeLeft = 300;  //TODO set this back to 30 (only increased so that it wouldnt interfere with testing)
->>>>>>> Stashed changes
         timerDisplay.textContent = timeLeft;
 
         clearInterval(timerInterval); // Clear any existing interval first
