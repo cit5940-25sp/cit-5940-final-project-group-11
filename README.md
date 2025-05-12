@@ -23,23 +23,28 @@ Assumptions include:
 
 ## Class Structure
 Classes are grouped in the primary following categories:
+
 **User Interface and logic to trigger changes to the view:**
 * ViewUI.html
 * ControllerClass
+
 **Primary game logic:**
 * GamePlay (checks connections based on user entry)
 * MovieLoader (loads the data)
 * MoveResult (validates the move)
+
 **Objects:**
 * Movie
 * Player
 * SingleConnection
+
 **Autocomplete functionality:**
 * Autocomplete
 * IAutocomplete
 * ITerm
 * Node
 * Term
+
 **Win condition logic:**
 * ActorWinStrategy
 * GenreWinStrategy
@@ -54,6 +59,7 @@ The design patterns employed were:
 Optional additional features employed include:
 * A win condition based on actor (instead of just genre)
 * HTML user interface for improved user experience
+* JavaDocs
 
 ## Authors
 This game was created by Angela Pan, Sam Polluck, and Rachel Draper.
