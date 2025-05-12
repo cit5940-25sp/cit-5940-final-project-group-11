@@ -1,6 +1,7 @@
 package com.example.movieGame;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
 import java.util.*;
 
 
@@ -29,6 +30,15 @@ public class GamePlay
     private Map<String, Integer> writerUsage = new HashMap<>();     // Maps writer name to usage count
     private Map<String, Integer> cinematographerUsage = new HashMap<>(); // Maps cinematographer to usage count
     private Map<String, Integer> composerUsage = new HashMap<>();   // Maps composer name to usage count
+
+    // add backward indices
+    private Map<String, Set<Movie>> moviesByActor = new HashMap<>();
+    private Map<String, Set<Movie>> moviesByDirector = new HashMap<>();
+    private Map<String, Set<Movie>> moviesByWriter = new HashMap<>();
+    private Map<String, Set<Movie>> moviesByCinematographer = new HashMap<>();
+    private Map<String, Set<Movie>> moviesByComposer = new HashMap<>();
+    private Map<String, Set<Movie>> moviesByGenre = new HashMap<>();
+
 
     private int numberOfRounds; //tracks # of rounds played (for display)
 
@@ -106,24 +116,77 @@ public class GamePlay
 
     // build the index here, and add each movie to autocomplete
     private void buildIndex() {
+        // Initialize existing maps
         moviesByTitle = new HashMap<>();
+
+        // Initialize backward index maps
+        moviesByActor = new HashMap<>();
+        moviesByDirector = new HashMap<>();
+        moviesByWriter = new HashMap<>();
+        moviesByCinematographer = new HashMap<>();
+        moviesByComposer = new HashMap<>();
+        moviesByGenre = new HashMap<>();
+
         autocomplete = new Autocomplete();
 
         // iterate over all movies
         for (Movie movie : availableMovies) {
-            //put in map of movie title, movie
+            // Add to forward index (existing code)
             moviesByTitle.put(movie.getMovieTitle().toLowerCase(), movie);
 
-            // create autocomplete trie
+            // create autocomplete trie (existing code)
             String titleAndYear = movie.getMovieTitle().toLowerCase() + ", " + movie.getReleaseYear();
             autocomplete.addWord(titleAndYear, movie.getMovieID());
-            //TODO: note - tolowercase functionality here/in autocomplete means dropdown shows as all lowercase
-            // to show camelCase in teh dropdown, could change weight to be a string that records the camel case title
-            // and return that instead of the all lowercase version...actually that may not work...regardless,
-            // think we should should leave as-is and only come back to it later if we have time
 
+            // Add to backward indexes (new code)
 
+            // Add to actors index
+            for (String actor : movie.getActors()) {
+                if (!moviesByActor.containsKey(actor)) {
+                    moviesByActor.put(actor, new HashSet<>());
+                }
+                moviesByActor.get(actor).add(movie);
+            }
 
+            // Add to directors index
+            for (String director : movie.getDirectors()) {
+                if (!moviesByDirector.containsKey(director)) {
+                    moviesByDirector.put(director, new HashSet<>());
+                }
+                moviesByDirector.get(director).add(movie);
+            }
+
+            // Add to writers index
+            for (String writer : movie.getWriters()) {
+                if (!moviesByWriter.containsKey(writer)) {
+                    moviesByWriter.put(writer, new HashSet<>());
+                }
+                moviesByWriter.get(writer).add(movie);
+            }
+
+            // Add to cinematographers index
+            for (String cinematographer : movie.getCinematographers()) {
+                if (!moviesByCinematographer.containsKey(cinematographer)) {
+                    moviesByCinematographer.put(cinematographer, new HashSet<>());
+                }
+                moviesByCinematographer.get(cinematographer).add(movie);
+            }
+
+            // Add to composers index
+            for (String composer : movie.getComposers()) {
+                if (!moviesByComposer.containsKey(composer)) {
+                    moviesByComposer.put(composer, new HashSet<>());
+                }
+                moviesByComposer.get(composer).add(movie);
+            }
+
+            // Add to genres index
+            for (String genre : movie.getGenre()) {
+                if (!moviesByGenre.containsKey(genre)) {
+                    moviesByGenre.put(genre, new HashSet<>());
+                }
+                moviesByGenre.get(genre).add(movie);
+            }
         }
     }
 
@@ -325,7 +388,6 @@ public class GamePlay
 
 
     public MoveResult validateMove(Movie movie) {
-
         // Check if movie has been used already
         if (moviesUsed.contains(movie.getMovieID())) {
             return MoveResult.failure("Movie already used");
@@ -346,105 +408,87 @@ public class GamePlay
         ArrayList<SingleConnection> overusedConnections = new ArrayList<>();
 
         boolean foundAnyConnection = false;
-        //boolean foundOverusedConnection = false;
 
+        // Check for shared actors
+        Set<String> sharedActors = new HashSet<>(previousMovie.getActors());
+        sharedActors.retainAll(movie.getActors());
 
-        // Check actors
-        for (String actor : previousMovie.getActors()) {
-            if (movie.getActors().contains(actor)) {
-
-                foundAnyConnection = true;
-                int usage = actorUsage.getOrDefault(actor, 0);
-                if (usage < 3) {
-                    // Found a valid actor connection that hasn't been used 3 times
-                    validConnections.add(new SingleConnection("Actor", actor));
-                } else {
-                    overusedConnections.add(new SingleConnection("Actor", actor, true));
-                }
+        for (String actor : sharedActors) {
+            foundAnyConnection = true;
+            int usage = actorUsage.getOrDefault(actor, 0);
+            if (usage < 3) {
+                validConnections.add(new SingleConnection("Actor", actor));
+            } else {
+                overusedConnections.add(new SingleConnection("Actor", actor, true));
             }
         }
 
-        // Check directors
-        for (String director : previousMovie.getDirectors()) {
-            if (movie.getDirectors().contains(director)) {
-                foundAnyConnection = true;
-                int usage = directorUsage.getOrDefault(director, 0);
-                if (usage < 3) {
-                    validConnections.add(new SingleConnection("Director", director));
-                } else {
-                    overusedConnections.add(new SingleConnection("Director", director,true));
-                }
+        // Check for shared directors
+        Set<String> sharedDirectors = new HashSet<>(previousMovie.getDirectors());
+        sharedDirectors.retainAll(movie.getDirectors());
+
+        for (String director : sharedDirectors) {
+            foundAnyConnection = true;
+            int usage = directorUsage.getOrDefault(director, 0);
+            if (usage < 3) {
+                validConnections.add(new SingleConnection("Director", director));
+            } else {
+                overusedConnections.add(new SingleConnection("Director", director, true));
             }
         }
 
-        // Check writers
-        for (String writer : previousMovie.getWriters()) {
-            if (movie.getWriters().contains(writer)) {
-                foundAnyConnection = true;
-                int usage = writerUsage.getOrDefault(writer, 0);
-                if (usage < 3) {
-                    validConnections.add(new SingleConnection("Writer", writer));
-                } else {
-                    overusedConnections.add(new SingleConnection("Writer", writer,true));
-                }
+        // Check for shared writers
+        Set<String> sharedWriters = new HashSet<>(previousMovie.getWriters());
+        sharedWriters.retainAll(movie.getWriters());
+
+        for (String writer : sharedWriters) {
+            foundAnyConnection = true;
+            int usage = writerUsage.getOrDefault(writer, 0);
+            if (usage < 3) {
+                validConnections.add(new SingleConnection("Writer", writer));
+            } else {
+                overusedConnections.add(new SingleConnection("Writer", writer, true));
             }
         }
 
-        // Check cinematographers
-        for (String cinematographer : previousMovie.getCinematographers()) {
-            if (movie.getCinematographers().contains(cinematographer)) {
+        // Check for shared cinematographers
+        Set<String> sharedCinematographers = new HashSet<>(previousMovie.getCinematographers());
+        sharedCinematographers.retainAll(movie.getCinematographers());
 
-                foundAnyConnection = true;
-                int usage = cinematographerUsage.getOrDefault(cinematographer, 0);
-                if (usage < 3) {
-                    validConnections.add(new SingleConnection("Cinematographer", cinematographer));
-                } else {
-                    overusedConnections.add(new SingleConnection("Cinematographer", cinematographer,true));
-                }
+        for (String cinematographer : sharedCinematographers) {
+            foundAnyConnection = true;
+            int usage = cinematographerUsage.getOrDefault(cinematographer, 0);
+            if (usage < 3) {
+                validConnections.add(new SingleConnection("Cinematographer", cinematographer));
+            } else {
+                overusedConnections.add(new SingleConnection("Cinematographer", cinematographer, true));
             }
         }
 
-        // Check composers
-        for (String composer : previousMovie.getComposers()) {
-            if (movie.getComposers().contains(composer)) {
+        // Check for shared composers
+        Set<String> sharedComposers = new HashSet<>(previousMovie.getComposers());
+        sharedComposers.retainAll(movie.getComposers());
 
-                foundAnyConnection = true;
-                int usage = composerUsage.getOrDefault(composer, 0);
-                if (usage < 3) {
-                    validConnections.add(new SingleConnection("Composer", composer));
-                } else {
-                    overusedConnections.add(new SingleConnection("Composer", composer, true));
-
-                }
+        for (String composer : sharedComposers) {
+            foundAnyConnection = true;
+            int usage = composerUsage.getOrDefault(composer, 0);
+            if (usage < 3) {
+                validConnections.add(new SingleConnection("Composer", composer));
+            } else {
+                overusedConnections.add(new SingleConnection("Composer", composer, true));
             }
         }
-
-        // If we didn't find any valid connections
-        /*if (validConnections.isEmpty()) {
-            return MoveResult.failure("No valid connection found between movies");
-        }*/
-
-
-
 
         movie.setOverloadedLinks(overusedConnections);
         if (!validConnections.isEmpty()) {
-            return MoveResult.success(validConnections,overusedConnections);
+            return MoveResult.success(validConnections, overusedConnections);
         }
 
         if (foundAnyConnection) {
-
             return MoveResult.failure("Connection made too many times", overusedConnections);
         }
 
         return MoveResult.failure("No valid connection found between movies");
-
-
-
-        // We found at least one valid connection
-        //return MoveResult.success(validConnections);
-
-
     }
 
     public void setActorUsage(String name, int freq) {
@@ -524,6 +568,107 @@ public class GamePlay
         //this.winStrategy = new GenreWinStrategy(winCondition);
 
     }
+
+
+
+
+
+
+
+
+    public Set<Movie> findMoviesWithSharedComposers(Movie movie) {
+        Set<Movie> connectedMovies = new HashSet<>();
+
+        for (String composer : movie.getComposers()) {
+            if (moviesByComposer.containsKey(composer)) {
+                connectedMovies.addAll(moviesByComposer.get(composer));
+            }
+        }
+
+        // Remove the original movie from the result set
+        connectedMovies.remove(movie);
+
+        // Remove already used movies
+        connectedMovies.removeIf(m -> moviesUsed.contains(m.getMovieID()));
+
+        return connectedMovies;
+    }
+
+    public Set<Movie> findMoviesWithSharedActors(Movie movie) {
+        Set<Movie> connectedMovies = new HashSet<>();
+
+        for (String actor : movie.getActors()) {
+            if (moviesByActor.containsKey(actor)) {
+                connectedMovies.addAll(moviesByActor.get(actor));
+            }
+        }
+
+        // Remove the original movie from the result set
+        connectedMovies.remove(movie);
+
+        // Remove already used movies
+        connectedMovies.removeIf(m -> moviesUsed.contains(m.getMovieID()));
+
+        return connectedMovies;
+    }
+
+
+    public Set<Movie> findMoviesWithSharedDirectors(Movie movie) {
+        Set<Movie> connectedMovies = new HashSet<>();
+
+        for (String director : movie.getDirectors()) {
+            if (moviesByDirector.containsKey(director)) {
+                connectedMovies.addAll(moviesByDirector.get(director));
+            }
+        }
+
+        // Remove the original movie from the result set
+        connectedMovies.remove(movie);
+
+        // Remove already used movies
+        connectedMovies.removeIf(m -> moviesUsed.contains(m.getMovieID()));
+
+        return connectedMovies;
+    }
+
+
+    public Set<Movie> findMoviesWithSharedCinematographers(Movie movie) {
+        Set<Movie> connectedMovies = new HashSet<>();
+
+        for (String cinematographer : movie.getCinematographers()) {
+            if (moviesByCinematographer.containsKey(cinematographer)) {
+                connectedMovies.addAll(moviesByCinematographer.get(cinematographer));
+            }
+        }
+
+        // Remove the original movie from the result set
+        connectedMovies.remove(movie);
+
+        // Remove already used movies
+        connectedMovies.removeIf(m -> moviesUsed.contains(m.getMovieID()));
+
+        return connectedMovies;
+    }
+    public Set<Movie> findMoviesWithSharedWriters(Movie movie) {
+        Set<Movie> connectedMovies = new HashSet<>();
+
+        for (String writer : movie.getWriters()) {
+            if (moviesByWriter.containsKey(writer)) {
+                connectedMovies.addAll(moviesByWriter.get(writer));
+            }
+        }
+
+        // Remove the original movie from the result set
+        connectedMovies.remove(movie);
+
+        // Remove already used movies
+        connectedMovies.removeIf(m -> moviesUsed.contains(m.getMovieID()));
+
+        return connectedMovies;
+    }
+
+
+
 
 
 }

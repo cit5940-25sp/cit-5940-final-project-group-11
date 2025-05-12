@@ -11,13 +11,6 @@ import static org.junit.Assert.*;
 
 public class GamePlayTest {
 
-    //private GamePlay gamePlay;
-    //private Movie movie1, movie2, movie3;
-
-
-
-
-
 
     @Test
     public void testCommonCinematographers() throws IOException {
