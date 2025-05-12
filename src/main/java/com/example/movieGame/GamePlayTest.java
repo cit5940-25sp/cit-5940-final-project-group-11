@@ -38,6 +38,12 @@ public class GamePlayTest {
         grand.setCinematographers(new HashSet<>(Set.of("Robert Yeoman")));
         rushmore.setCinematographers(new HashSet<>(Set.of("Robert Yeoman")));
 
+        if (!play.moviesByCinematographer.containsKey("Robert Yeoman")) {
+            play.moviesByCinematographer.put("Robert Yeoman", new HashSet<>());
+        }
+        play.moviesByCinematographer.get("Robert Yeoman").add(grand);
+        play.moviesByCinematographer.get("Robert Yeoman").add(rushmore);
+
         play.lastFiveMovies.clear();
         play.moviesUsed.clear();
         play.setFirstMovie(grand);
@@ -146,9 +152,17 @@ public class GamePlayTest {
         Movie loneRanger = movieMap.get(57201);    // The Lone Ranger
         Movie aliceThroughLookingGlass = movieMap.get(241259);    // Alice Through the Looking Glass
 
+        System.out.println(loneRanger.getMovieID());
+        System.out.println(loneRanger.getMovieTitle());
+
+        System.out.println(loneRanger.getActors());
+
+        System.out.println(aliceThroughLookingGlass.getActors());
+
 
         // Create GamePlay
         GamePlay gamePlay = new GamePlay("Player1", "Player2");
+        gamePlay.setWinCondition("GenreWinStrategy");
 
         // Clear any existing movies in the queue
         while (!gamePlay.lastFiveMovies.isEmpty()) {
@@ -158,9 +172,12 @@ public class GamePlayTest {
         // Add Lone Ranger as the "last" movie
         gamePlay.lastFiveMovies.add(loneRanger);
         gamePlay.moviesUsed.add(loneRanger.getMovieID());
+        gamePlay.setFirstMovie(loneRanger);
 
         // Validate Alice Through the Looking Glass against Lone Ranger
         MoveResult result = gamePlay.validateMove(aliceThroughLookingGlass);
+
+        System.out.println(gamePlay.userEntry(aliceThroughLookingGlass));
 
         // Basic validation
         assertTrue("Expected to find a valid connection", result.isValid());
@@ -461,6 +478,9 @@ public class GamePlayTest {
         play.lastFiveMovies.add(philStoneHP);
         play.moviesUsed.add(philStoneHP.getMovieID());
         play.setWinCondition("GenreWinStrategy");
+
+        System.out.println(philStoneHP.getGenre());
+        System.out.println(chamberSecretsHP.getGenre());
 
 
 

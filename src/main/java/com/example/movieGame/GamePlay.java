@@ -35,7 +35,7 @@ public class GamePlay {
     private Map<String, Set<Movie>> moviesByActor = new HashMap<>();
     private Map<String, Set<Movie>> moviesByDirector = new HashMap<>();
     private Map<String, Set<Movie>> moviesByWriter = new HashMap<>();
-    private Map<String, Set<Movie>> moviesByCinematographer = new HashMap<>();
+    Map<String, Set<Movie>> moviesByCinematographer = new HashMap<>();
     private Map<String, Set<Movie>> moviesByComposer = new HashMap<>();
     private Map<String, Set<Movie>> moviesByGenre = new HashMap<>();
 
@@ -384,6 +384,10 @@ public class GamePlay {
      * @param movie accepts the movie being checked against the most recent movie
      * @return returns an object indicating whether the move was valid, why it isn't (if not), connections, and overused connections
      */
+
+    // less index
+
+    /**
     public MoveResult validateMove(Movie movie) {
         // Check if movie has been used already
         if (moviesUsed.contains(movie.getMovieID())) {
@@ -491,6 +495,127 @@ public class GamePlay {
         return MoveResult.failure("No valid connection found between movies");
 
     }
+
+    **/
+
+
+    public MoveResult validateMove(Movie movie) {
+        // Check if movie has been used already
+        if (moviesUsed.contains(movie.getMovieID())) {
+            return MoveResult.failure("Movie already used");
+        }
+
+        // Get the previous movie to compare against
+        Movie previousMovie = null;
+        if (!lastFiveMovies.isEmpty()) {
+            previousMovie = ((LinkedList<Movie>) lastFiveMovies).getLast();
+        } else if (firstMovie != null) {
+            previousMovie = firstMovie;
+        } else {
+            return MoveResult.failure("No previous movie to connect to");
+        }
+
+        // We'll collect all valid connections AND overused connections
+        List<SingleConnection> validConnections = new ArrayList<>();
+        ArrayList<SingleConnection> overusedConnections = new ArrayList<>();
+        boolean foundAnyConnection = false;
+
+        // Check actors - using backward index
+        for (String actor : previousMovie.getActors()) {
+            if (moviesByActor.containsKey(actor)) {
+                Set<Movie> moviesWithActor = moviesByActor.get(actor);
+                if (moviesWithActor.contains(movie)) {
+                    foundAnyConnection = true;
+                    int usage = actorUsage.getOrDefault(actor, 0);
+                    if (usage < 3) {
+                        validConnections.add(new SingleConnection("Actor", actor));
+                    } else {
+                        overusedConnections.add(new SingleConnection("Actor", actor, true));
+                    }
+                }
+            }
+        }
+
+        // Check directors - using backward index
+        for (String director : previousMovie.getDirectors()) {
+            if (moviesByDirector.containsKey(director)) {
+                Set<Movie> moviesWithDirector = moviesByDirector.get(director);
+                if (moviesWithDirector.contains(movie)) {
+                    foundAnyConnection = true;
+                    int usage = directorUsage.getOrDefault(director, 0);
+                    if (usage < 3) {
+                        validConnections.add(new SingleConnection("Director", director));
+                    } else {
+                        overusedConnections.add(new SingleConnection("Director", director, true));
+                    }
+                }
+            }
+        }
+
+        // Check writers - using backward index
+        for (String writer : previousMovie.getWriters()) {
+            if (moviesByWriter.containsKey(writer)) {
+                Set<Movie> moviesWithWriter = moviesByWriter.get(writer);
+                if (moviesWithWriter.contains(movie)) {
+                    foundAnyConnection = true;
+                    int usage = writerUsage.getOrDefault(writer, 0);
+                    if (usage < 3) {
+                        validConnections.add(new SingleConnection("Writer", writer));
+                    } else {
+                        overusedConnections.add(new SingleConnection("Writer", writer, true));
+                    }
+                }
+            }
+        }
+
+        // Check cinematographers - using backward index
+        for (String cinematographer : previousMovie.getCinematographers()) {
+            if (moviesByCinematographer.containsKey(cinematographer)) {
+                Set<Movie> moviesWithCinematographer = moviesByCinematographer.get(cinematographer);
+                if (moviesWithCinematographer.contains(movie)) {
+                    foundAnyConnection = true;
+                    int usage = cinematographerUsage.getOrDefault(cinematographer, 0);
+                    if (usage < 3) {
+                        validConnections.add(new SingleConnection("Cinematographer", cinematographer));
+                    } else {
+                        overusedConnections.add(new SingleConnection("Cinematographer", cinematographer, true));
+                    }
+                }
+            }
+        }
+
+        // Check composers - using backward index
+        for (String composer : previousMovie.getComposers()) {
+            if (moviesByComposer.containsKey(composer)) {
+                Set<Movie> moviesWithComposer = moviesByComposer.get(composer);
+                if (moviesWithComposer.contains(movie)) {
+                    foundAnyConnection = true;
+                    int usage = composerUsage.getOrDefault(composer, 0);
+                    if (usage < 3) {
+                        validConnections.add(new SingleConnection("Composer", composer));
+                    } else {
+                        overusedConnections.add(new SingleConnection("Composer", composer, true));
+                    }
+                }
+            }
+        }
+
+        // Store the overused connections for display
+        movie.setOverloadedLinks(overusedConnections);
+
+        // Determine result based on connections found
+        if (!validConnections.isEmpty()) {
+            return MoveResult.success(validConnections, overusedConnections);
+        }
+
+        if (foundAnyConnection) {
+            return MoveResult.failure("Connection made too many times", overusedConnections);
+        }
+
+        return MoveResult.failure("No valid connection found between movies");
+    }
+
+
 
     /**
      * Setter for actor usage
