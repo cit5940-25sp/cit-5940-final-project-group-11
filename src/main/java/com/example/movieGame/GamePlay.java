@@ -1,6 +1,5 @@
 package com.example.movieGame;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -42,17 +41,12 @@ public class GamePlay
 
     private final int maxTimePerTurn = 30;
 
-
     Queue<Movie> lastFiveMovies; //LinkedList of movie objects showing last 5 (FIFO)
     private Movie firstMovie; //first randomly selected movie
     private String winCondition; //TODO move this to Win class once it's set up
 
-
-
-
     private Player player1;
     private Player player2;
-
 
     private Autocomplete autocomplete;
 
@@ -64,6 +58,9 @@ public class GamePlay
     /**
      * Constructor initializes variables, creates players and designates first active player,
      * sets up index with movies, randomly select movie
+     *
+     * @param player1Name name of player 1
+     * @param player2Name name of player 2
      *
      */
     public GamePlay(String player1Name, String player2Name) {
@@ -105,7 +102,10 @@ public class GamePlay
     }
 
 
-    // build the index here, and add each movie to autocomplete
+    /**
+     * Builds the index and adds each movie to autocomplete
+     *
+     */
     private void buildIndex() {
         moviesByTitle = new HashMap<>();
         autocomplete = new Autocomplete();
@@ -128,11 +128,9 @@ public class GamePlay
 
 
     /**
-     * selects first move for the start of the game from within index
+     * Selects first move for the start of the game
      *
      */
-
-
     public Movie randomMovieSelection() {
 
         try {
@@ -186,13 +184,11 @@ public class GamePlay
     }
 
 
-
-
-
-     /* updates game state and variables based on user entry
+     /**
+     * updates game state and variables based on user entry
      *
-     * @return error message citing reason for the error
-     * @parameter
+     * @return message citing whethere there's an error, or if the connection is valid
+     * @param movie movie selected by user
      */
     public String userEntry(Movie movie) {
 
@@ -203,7 +199,6 @@ public class GamePlay
 
         // First validate the move
         MoveResult result = validateMove(movie);
-
 
         // invalid move, with overused connections
         if (!result.isValid()) {
@@ -222,7 +217,6 @@ public class GamePlay
             return result.getErrorMessage(); // Return the error from validation
         }
 
-
         // Move is valid, process it
         if (!result.getConnections().isEmpty()) {
             // Store all connections with the movie
@@ -232,9 +226,7 @@ public class GamePlay
                 movie.linksToPreviousMovie.clear(); // Clear any existing connections
             }
 
-
-           // SingleConnection primaryConnection = result.getConnections().get(0);
-
+            // SingleConnection primaryConnection = result.getConnections().get(0);
             // Update the appropriate usage counter for the primary connection
 
             for (SingleConnection connection : result.getConnections()) {
@@ -301,6 +293,11 @@ public class GamePlay
         return "Valid User Entry";
     }
 
+    /**
+     * Returns the active player
+     *
+     * @return active player
+     */
     public Player getActivePlayer() {
         if (player1.getIsActive()) {
             return player1;
@@ -308,14 +305,11 @@ public class GamePlay
             return player2;
         }
     }
-    public Player getInactivePlayer() {
-        if (player1.getIsInactive()) {
-            return player1;
-        } else {
-            return player2;
-        }
-    }
 
+    /**
+     * Switches who the active player is
+     *
+     */
     public void switchActivePlayer() {
         player1.setIsActive(!player1.getIsActive());
         player2.setIsActive(!player2.getIsActive());
@@ -323,7 +317,12 @@ public class GamePlay
         player2.setIsActive(!player2.getIsInactive());
     }
 
-
+    /**
+     * Checks whether the move is valid or invalid
+     *
+     * @param movie accepts the movie being checked against the most recent movie
+     * @return returns an object indicating whether the move was valid, why it isn't (if not), connections, and overused connections
+     */
     public MoveResult validateMove(Movie movie) {
 
         // Check if movie has been used already
@@ -347,7 +346,6 @@ public class GamePlay
 
         boolean foundAnyConnection = false;
         //boolean foundOverusedConnection = false;
-
 
         // Check actors
         for (String actor : previousMovie.getActors()) {
@@ -434,74 +432,117 @@ public class GamePlay
         }
 
         return MoveResult.failure("No valid connection found between movies");
-
-
-
         // We found at least one valid connection
         //return MoveResult.success(validConnections);
-
-
     }
 
+    /**
+     * Setter for actor usage
+     *
+     * @param name name of the actor
+     * @param freq frequency with which the actor has been used
+     */
     public void setActorUsage(String name, int freq) {
-
         actorUsage.put(name,freq);
     }
 
-
+    /**
+     * Based on the movie id selected by the user, this method finds the corresponding Movie object from within the hashmap and returns it
+     * This is used in conjunction with autocomplete dropdown functionality
+     *
+     * @return returns the corresponding Movie object
+     * @param movieId the id of the movie selected by the user
+     */
     public Movie findTermById(int movieId) {
         return availableMoviesHashMap.get(movieId);
     }
 
-
-
     /**
+     * Getter for player1 object
      *
-     *
+     * @return player 1
      */
-
-
-
     public Player getPlayer1() {
         return player1;
     }
+
+    /**
+     * Getter for player2 object
+     *
+     * @return player 2
+     */
     public Player getPlayer2() {
         return player2;
     }
+
+    /**
+     * Getter for active player
+     *
+     * @return name of active player
+     */
     public String getActivePlayerName() {
-        /*if (player1.getIsActive()) {
-            return player1.getUserName();
-        } else {
-            return player2.getUserName();
-        }*/
         return getActivePlayer().getUserName();
     }
 
-
+    /**
+     * Getter for number of rounds
+     *
+     * @return number of rounds played
+     */
     public int getNumberOfRounds() {
         return numberOfRounds;
     }
+
+    /**
+     * Getter for first movie object
+     *
+     * @return Movie object for first movie
+     */
     public Movie getFirstMovie() {
         return firstMovie;
     }
+
+    /**
+     * Getter for autocomplete (used in ControllerClass)
+     *
+     * @return Autocomplete
+     */
     public Autocomplete getAutocomplete() {
         return autocomplete;
     }
+
+    /**
+     * Getter for queue of last five movies
+     *
+     * @return queue of last five movies
+     */
     public Queue<Movie> getLastFiveMovies() {
         return lastFiveMovies;
     }
 
-    //TODO move this to win class once created and update UI accordingly
+    /**
+     * Getter for win condition
+     *
+     * @return win condition selected by user
+     */
     public String getWinCondition() {
         return winCondition;
-
     }
 
+    /**
+     * Setter for first movie object
+     *
+     * @param movie movie object to be designated as the first movie
+     */
     public void setFirstMovie(Movie movie) {
         this.firstMovie = movie;
     }
 
-    //TODO move this to win class once created and update UI accordingly
+    /**
+     * Setter for win condition
+     *
+     * @param winCondition win condition selected by user
+     */
     public void setWinCondition(String winCondition) {
         //Set the winCondition as what is entered in the UI
         //Define the strategy based on the entered genre
@@ -513,13 +554,6 @@ public class GamePlay
         } else {
             this.winStrategy = new GenreWinStrategy(winCondition);
         }
-
-
         //this.winStrategy = new GenreWinStrategy(winCondition);
-
     }
-
-
 }
-
-
