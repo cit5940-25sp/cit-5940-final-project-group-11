@@ -16,7 +16,7 @@ public class GamePlay
 
     //Win Strategy tracker
     private WinStrategy winStrategy;
-    private boolean gameEnded = false;
+    boolean gameEnded = false;
 
     //Index Maps
     private Map<String, Movie> moviesByTitle;
@@ -186,46 +186,7 @@ public class GamePlay
         }
     }
 
-    //Checks whether the movie entered has a valid linkage
-    /*public boolean checkValidLinkage(Movie movie) {
 
-        //If the movie entered is the first movie, no valid linkage required
-        if (lastFiveMovies.isEmpty())  {
-            return true;
-        }
-
-        //Extract the previous movie
-        //Return true if there was no previous movie (as above)
-        Movie previous = ((LinkedList<Movie>) lastFiveMovies).peekLast();
-        if (previous == null) return true;
-
-
-        //Compare across each of the criteria to determine connections
-        return sharesConnection(movie.getActors(), previous.getActors()) ||
-                sharesConnection(movie.getDirectors(), previous.getDirectors()) ||
-                sharesConnection(movie.getWriters(), previous.getWriters()) ||
-                sharesConnection(movie.getCinematographers(), previous.getCinematographers()) ||
-                sharesConnection(movie.getComposers(), previous.getComposers());
-
-    }
-
-    //Private helper method to determine whether there is a shared connection
-    //Connection defined as actor, director, writer, cinematographer or composer
-    private boolean sharesConnection(Set<String> movieOne, Set<String> movieTwo) {
-        for (String value : movieOne) {
-            if (movieTwo.contains(value)) {
-                return true;
-            }
-        }
-        return false;
-    }*/
-
-
-    /*public Movie getMovieFromTitle(String title) {
-        title = title.strip().toLowerCase();
-
-        return moviesByTitle.get(title);
-    }*/
 
 
 
@@ -303,9 +264,22 @@ public class GamePlay
 
 
 
+
+
             // Store all valid connections for display
             movie.linksToPreviousMovie.addAll(result.getConnections());
-            movie.overloadedLinksToPreviousMovie.addAll(result.getOverusedConnections());
+
+            //movie.overloadedLinksToPreviousMovie.addAll(result.getOverusedConnections());
+            movie.setOverloadedLinks((ArrayList<SingleConnection>)result.getOverusedConnections());
+
+
+            /*System.out.println("After adding:");
+            System.out.println("  - movie.overloadedLinksToPreviousMovie size: " +
+            movie.overloadedLinksToPreviousMovie.size());
+            System.out.println("  - contents: ");
+            for (SingleConnection conn : movie.overloadedLinksToPreviousMovie) {
+                System.out.println("    * " + conn.getConnectionType() + ": " + conn.getName());
+            }*/
         }
 
         // Add movie to used list
@@ -340,13 +314,7 @@ public class GamePlay
             return player2;
         }
     }
-    public Player getInactivePlayer() {
-        if (player1.getIsInactive()) {
-            return player1;
-        } else {
-            return player2;
-        }
-    }
+
 
     public void switchActivePlayer() {
         player1.setIsActive(!player1.getIsActive());
@@ -455,6 +423,10 @@ public class GamePlay
         /*if (validConnections.isEmpty()) {
             return MoveResult.failure("No valid connection found between movies");
         }*/
+
+
+
+
         movie.setOverloadedLinks(overusedConnections);
         if (!validConnections.isEmpty()) {
             return MoveResult.success(validConnections,overusedConnections);
@@ -485,25 +457,7 @@ public class GamePlay
         return availableMoviesHashMap.get(movieId);
     }
 
-   /* private boolean checkIfContributesToWinCondition (Movie movie) {
-        String winCond = this.winCondition;
-        if (winCondition.equals("horror") && movie.getGenre().contains("Horror")) {
-            return true;
-        } else if (winCondition.equals("comedy") && movie.getGenre().contains("Comedy")) {
-            return true;
-        } else if (winCondition.equals("action") && movie.getGenre().contains("Action")) {
-            return true;
-        } else if (winCondition.equals("sciFi") &&
-                (movie.getGenre().contains("Science Fiction") || movie.getGenre().contains("Sci-Fi"))) {
-            return true;
-        } else if (winCondition.equals("drama") && movie.getGenre().contains("Drama")) {
-            return true;
-        }
 
-        return false;
-
-
-    }*/
 
     /**
      *

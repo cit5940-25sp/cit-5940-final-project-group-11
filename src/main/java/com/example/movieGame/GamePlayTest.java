@@ -2,6 +2,8 @@ package com.example.movieGame;
 
 import org.testng.annotations.Test;
 
+import javax.sound.midi.Soundbank;
+import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.io.IOException;
 import java.util.*;
 
@@ -13,6 +15,104 @@ public class GamePlayTest {
     //private Movie movie1, movie2, movie3;
 
 
+
+
+
+
+    @Test
+    public void testCommonCinematographers() throws IOException {
+        // Load movie data
+        MovieLoader.creditCSVRead();
+        MovieLoader.moviesCSVRead();
+        List<Movie> movieOutputs = MovieLoader.createMovieFromFiles();
+
+        // Create a new GamePlay instance
+        GamePlay play = new GamePlay("Sam", "Angela");
+
+        // Get grandbudapesthotel, moonrise kingdom and rushmore
+
+        Movie grand = play.findTermById(120467);
+        Movie rushmore = play.findTermById(11545);
+        Movie moonrise = play.findTermById(83666);
+
+
+
+        // update the cinematographers of these two movies to make the connection
+        grand.setCinematographers(new HashSet<>(Set.of("Robert Yeoman")));
+        rushmore.setCinematographers(new HashSet<>(Set.of("Robert Yeoman")));
+
+        play.lastFiveMovies.clear();
+        play.moviesUsed.clear();
+        play.setFirstMovie(grand);
+        play.lastFiveMovies.add(grand);
+        play.moviesUsed.add(grand.getMovieID());
+        play.setWinCondition("Drama");
+
+        // initially, we should have no progress
+        assertEquals("progress should be zero", 0, play.getPlayer1().getProgressTowardWin());
+
+        // play the movie rushmore
+        MoveResult result = play.validateMove(rushmore);
+        String entry = play.userEntry(rushmore);
+
+
+        assertTrue("Move should be valid with common cinematographer", result.isValid());
+
+        ArrayList<SingleConnection> rushmoreLinks = rushmore.getLinksToPreviousMovie();
+
+
+        // check for Yeoman specifically
+        boolean foundCinematographerConnection = false;
+        for (SingleConnection connection : rushmoreLinks) {
+            if ("Cinematographer".equals(connection.getConnectionType()) &&
+                    "Robert Yeoman".equals(connection.getName())) {
+                foundCinematographerConnection = true;
+                break;
+            }
+        }
+
+        assertTrue("Should find Robert Yeoman as a cinematographer connection", foundCinematographerConnection);
+
+        assertEquals("progress should increase", 1, play.getPlayer1().getProgressTowardWin());
+
+        // manually set progress toward win to make sure the win goes into effect next round
+        play.getPlayer2().setProgressInt(4);
+        System.out.println(play.getPlayer2().getProgressTowardWin());
+
+        // play moonrise kingdom, which should go to a drama win
+        result = play.validateMove(moonrise);
+        assertTrue("Moonrise Kingdom move should be valid", result.isValid());
+        entry = play.userEntry(moonrise);
+
+        assertEquals("Win condition met", entry);
+
+        assertTrue("Game should have ended", play.gameEnded);
+
+
+    }
+    @Test
+    public void testBadMovieList() {
+        GamePlay play = new GamePlay("Player1", "Player2");
+
+        // Try to find a movie with an invalid ID (very large number unlikely to exist)
+        Movie nonExistentMovie = play.findTermById(999999999);
+        assertNull("Non-existent movie ID should return null", nonExistentMovie);
+
+        // Try to find a movie with a negative ID (invalid)
+        Movie negativeIdMovie = play.findTermById(-123);
+        assertNull("Negative movie ID should return null", negativeIdMovie);
+
+        //Try using a non-existent movie in a move
+        Movie fakeMovie = new Movie("Fake Movie", 9999, 2023L,
+                new HashSet<>(), new HashSet<>(), new HashSet<>(),
+                new HashSet<>(), new HashSet<>(), new HashSet<>());
+
+        MoveResult result = play.validateMove(fakeMovie);
+        assertFalse("Move with fake movie should be invalid", result.isValid());
+        assertEquals("Should have no valid connection",
+                "No valid connection found between movies", result.getErrorMessage());
+
+    }
 
 
     @Test
@@ -34,99 +134,6 @@ public class GamePlayTest {
                 gamePlay.lastFiveMovies.contains(selectedMovie));
     }
 
-    @Test
-    public void testCheckValidLinkage() {
-
-    }
-
-
-
-    @Test
-    public void testFindingConnection() throws IOException {
-        // Load movie data
-        MovieLoader.creditCSVRead();
-        MovieLoader.moviesCSVRead();
-        List<Movie> movieOutputs = MovieLoader.createMovieFromFiles();
-
-        // Get the two Pirates movies
-        Movie pirates1 = movieOutputs.get(18); // Pirates of the Caribbean: The Curse of the Black Pearl
-        Movie pirates2 = movieOutputs.get(38); // Pirates of the Caribbean: Dead Man's Chest
-
-        Movie interstellar = movieOutputs.get(1474); // Pirates of the Caribbean: Dead Man's Chest
-
-
-        System.out.println(interstellar);
-
-        System.out.println(pirates1);
-        System.out.println(pirates2);
-
-        System.out.println("Movie 1: " + pirates1.getMovieTitle());
-        System.out.println("Movie 1 actors: " + pirates1.getActors());
-        System.out.println("Movie 1 directors: " + pirates1.getDirectors());
-
-        System.out.println("\nMovie 2: " + pirates2.getMovieTitle());
-        System.out.println("Movie 2 actors: " + pirates2.getActors());
-        System.out.println("Movie 2 directors: " + pirates2.getDirectors());
-
-        // Find shared actors (for debugging/information)
-        HashSet<String> sharedActors = new HashSet<>(pirates1.getActors());
-        sharedActors.retainAll(pirates2.getActors());
-        System.out.println("\nShared actors: " + sharedActors);
-
-        // Find shared directors
-        HashSet<String> sharedDirectors = new HashSet<>(pirates1.getDirectors());
-        sharedDirectors.retainAll(pirates2.getDirectors());
-        System.out.println("Shared directors: " + sharedDirectors);
-
-
-
-        // Create a custom GamePlay for testing
-        GamePlay play = new GamePlay("P1", "P2");
-
-        // We need to set pirates1 as the first/previous movie
-        // If there's no direct setter, we can create a method for testing
-        // For now, let's try a workaround by adding it to lastFiveMovies
-
-        // Clear any existing movies in the queue
-        while (!play.lastFiveMovies.isEmpty()) {
-            play.lastFiveMovies.poll();
-        }
-
-        // Add pirates1 as the "last" movie
-        play.lastFiveMovies.add(pirates1);
-
-        play.setActorUsage("David Bailie", 3);
-
-
-        // If we need to add it to moviesUsed
-        play.moviesUsed.add(pirates1.getMovieID());
-
-        // Now validate pirates2 against pirates1
-        MoveResult result = play.validateMove(pirates2);
-
-        System.out.println("\nMove validation result: " + (result.isValid() ? "Valid" : "Invalid"));
-
-        if (result.isValid()) {
-            System.out.println("Valid connections found:");
-            for (SingleConnection connection : result.getConnections()) {
-                System.out.println("  Type: " + connection.getConnectionType() + ", Name: " + connection.getName());
-            }
-
-            // Assert that we found a valid connection
-            assertTrue("Expected to find a valid connection", result.isValid());
-        } else {
-            System.out.println("Error message: " + result.getErrorMessage());
-
-            // If validation failed unexpectedly, print more debug info
-            if (!sharedActors.isEmpty() || !sharedDirectors.isEmpty()) {
-                fail("Validation failed despite shared cast/crew");
-            }
-        }
-
-
-
-    }
-
 
     @Test
     public void testConnectionBetweenLoneRangerAndAlice() throws IOException {
@@ -141,6 +148,7 @@ public class GamePlayTest {
         // Get our specific test movies by ID
         Movie loneRanger = movieMap.get(57201);    // The Lone Ranger
         Movie aliceThroughLookingGlass = movieMap.get(241259);    // Alice Through the Looking Glass
+
 
         // Create GamePlay
         GamePlay gamePlay = new GamePlay("Player1", "Player2");
@@ -161,7 +169,7 @@ public class GamePlayTest {
         assertTrue("Expected to find a valid connection", result.isValid());
         assertFalse("Expected to find at least one connection", result.getConnections().isEmpty());
 
-        // Collect actor connections from the result
+        // get actor connections from the result
         Set<String> actorConnectionsFound = new HashSet<>();
         Set<String> directorConnectionsFound = new HashSet<>();
         for (SingleConnection connection : result.getConnections()) {
@@ -185,72 +193,6 @@ public class GamePlayTest {
         // Verify no extra actors were found
         assertEquals("Should find exactly 2 shared actors", 2, actorConnectionsFound.size());
     }
-
-
-
-    @Test
-    public void testSomethingElse() throws IOException {
-        // Load movie data
-        MovieLoader.creditCSVRead();
-        MovieLoader.moviesCSVRead();
-        List<Movie> movieOutputs = MovieLoader.createMovieFromFiles();
-
-        // Create GamePlay
-        GamePlay play = new GamePlay("Sam", "Angela");
-
-        // Set a win condition
-        play.setWinCondition("Drama");
-
-        // Get the Harry Potter movies
-        Movie philStoneHP = play.findTermById(671);
-        Movie chamberSecretsHP = play.findTermById(672);
-
-        // Check if the movies were found
-        assertNotNull("Philosopher's Stone should be found", philStoneHP);
-        assertNotNull("Chamber of Secrets should be found", chamberSecretsHP);
-
-        // Debug - print actor info to check for common connections
-        System.out.println("Movie 1 actors: " + philStoneHP.getActors());
-        System.out.println("Movie 2 actors: " + chamberSecretsHP.getActors());
-
-        // Find shared actors (for debugging)
-        HashSet<String> sharedActors = new HashSet<>(philStoneHP.getActors());
-        sharedActors.retainAll(chamberSecretsHP.getActors());
-        System.out.println("Shared actors: " + sharedActors);
-        System.out.println(sharedActors.size());
-
-        // If no shared actors, manually create a connection for testing
-
-
-        // Reset the game state
-        while (!play.lastFiveMovies.isEmpty()) {
-            play.lastFiveMovies.poll();
-        }
-        play.moviesUsed.clear();
-
-        // Set up the first movie properly
-        play.setFirstMovie(philStoneHP);
-        play.lastFiveMovies.add(philStoneHP);
-        play.moviesUsed.add(philStoneHP.getMovieID());
-
-        // Verify the setup
-        System.out.println("First movie: " + play.getFirstMovie().getMovieTitle());
-        System.out.println("Last movie in queue: " + ((LinkedList<Movie>)play.lastFiveMovies).getLast().getMovieTitle());
-
-        // Now submit the second movie
-        MoveResult result = play.validateMove(chamberSecretsHP);
-        System.out.println("Validation result: " + (result.isValid() ? "Valid" : "Invalid"));
-        if (!result.isValid()) {
-            System.out.println("Error: " + result.getErrorMessage());
-        }
-
-        // Now test userEntry
-        String entryResult = play.userEntry(chamberSecretsHP);
-        System.out.println("User entry result: " + entryResult);
-    }
-
-
-
 
 
     @Test
@@ -505,6 +447,7 @@ public class GamePlayTest {
         Movie gobFireHP = play.findTermById(674);
         Movie perksOfBeingWallflower = play.findTermById(84892);
         Movie napDynamite = play.findTermById(8193);
+        Movie loveAckshually = play.findTermById(508);
 
         assertNotNull("Philosopher's Stone should be found", philStoneHP);
         assertNotNull("Chamber of Secrets should be found", chamberSecretsHP);
@@ -514,7 +457,7 @@ public class GamePlayTest {
         assertNotNull("The goblet of Fire should be found", gobFireHP);
         assertNotNull("Perks of Being a Wallflower should be found", perksOfBeingWallflower);
 
-        // Clear previous movies and set the first movie
+        // Clear previous movies and set the first movie as 1st Harry potter movie
         play.lastFiveMovies.clear();
         play.moviesUsed.clear();
         play.setFirstMovie(philStoneHP);
@@ -524,15 +467,13 @@ public class GamePlayTest {
 
 
 
-        // User entry with Chamber of Secrets
+        // User first entry os Chamber of Secrets
         String entryResult = play.userEntry(chamberSecretsHP);
         assertEquals("Valid User Entry", entryResult);
 
         // Verify that Chamber of Secrets is now in lastFiveMovies and moviesUsed
         assertTrue("Chamber of Secrets should be in lastFiveMovies", play.lastFiveMovies.contains(chamberSecretsHP));
         assertTrue("Chamber of Secrets should be in moviesUsed", play.moviesUsed.contains(chamberSecretsHP.getMovieID()));
-
-
 
         // Verify common connections in Chamber of Secrets
         ArrayList<SingleConnection> chamberSecretsList = chamberSecretsHP.getLinksToPreviousMovie();
@@ -549,23 +490,26 @@ public class GamePlayTest {
             assertTrue("Expected connection for " + expected, actualConnections.contains(expected));
         }
 
-
-
         // Verify player switch
         String activePlayerAfterEntry = play.getActivePlayer().getUserName();
         assertEquals("Expected player to switch after valid entry", play.getPlayer2().getUserName(), activePlayerAfterEntry);
 
+
+
+
+
+
         // Now do perks of being a wallflower
 
         entryResult = play.userEntry(perksOfBeingWallflower);
+        assertTrue("Perks of BAWF should be in lastFiveMovies", play.lastFiveMovies.contains(perksOfBeingWallflower));
+        assertTrue("Perks of BAWF should be in moviesUsed", play.moviesUsed.contains(perksOfBeingWallflower.getMovieID()));
 
         activePlayerAfterEntry = play.getActivePlayer().getUserName();
         assertEquals("Expected player to switch after valid entry", play.getPlayer1().getUserName(), activePlayerAfterEntry);
         assertEquals("Valid User Entry", entryResult);
 
         ArrayList<SingleConnection> wallflowerList = perksOfBeingWallflower.getLinksToPreviousMovie();
-
-
 
         assertEquals("This connection should only be Actor Emma Watson:",
                 "Actor", wallflowerList.get(0).getConnectionType());
@@ -576,9 +520,13 @@ public class GamePlayTest {
 
 
 
-        // Set usage for Daniel Radcliffe to 3 and validate another entry
-        //play.setActorUsage("Daniel Radcliffe", 3);
+        // Next do POA
+
         entryResult = play.userEntry(prisonerAzkabanHP);
+        assertTrue("Prisoner of Azkaban should be in lastFiveMovies", play.lastFiveMovies.contains(prisonerAzkabanHP));
+        assertTrue("Prisoner of Azkaban should be in moviesUsed", play.moviesUsed.contains(prisonerAzkabanHP.getMovieID()));
+
+
         activePlayerAfterEntry = play.getActivePlayerName();
         assertEquals("Expected player to switch after valid entry", "Angela", activePlayerAfterEntry);
         assertEquals("Valid User Entry", entryResult);
@@ -591,10 +539,16 @@ public class GamePlayTest {
                 "Emma Watson", azkabanList.get(0).getName());
         assertEquals("Only emma should be here", 1, azkabanList.size());
 
-        System.out.println("azkaban done");
 
+
+
+
+
+        // now do Goblet of Fire
         entryResult = play.userEntry(gobFireHP);
         assertEquals("Valid User Entry", entryResult);
+        assertTrue("Goblet of Fire should be in lastFiveMovies", play.lastFiveMovies.contains(gobFireHP));
+        assertTrue("Goblet of Fire should be in moviesUsed", play.moviesUsed.contains(gobFireHP.getMovieID()));
 
         // Collect overused connections
         Set<String> overusedConnections = new HashSet<>();
@@ -604,11 +558,120 @@ public class GamePlayTest {
             }
         }
 
-        // Check that Daniel Radcliffe is overused
-        //assertTrue("Daniel Radcliffe should be overused", overusedConnections.contains("Daniel Radcliffe"));
+
+
+        //assertFalse("Emma Watson should not be overused", overusedConnections.contains("Emma Watson"));
+        //assertTrue("No overused connections yet", overusedConnections.isEmpty());
+
+
+
+
+        // now, finally, play order of phoenix, so NOW emma should be overloaded
+
+        entryResult = play.userEntry(orderPhoenixHP);
+        assertEquals("Valid User Entry", entryResult);
+        assertTrue("Goblet of Fire should be in lastFiveMovies", play.lastFiveMovies.contains(orderPhoenixHP));
+        assertTrue("Goblet of Fire should be in moviesUsed", play.moviesUsed.contains(orderPhoenixHP.getMovieID()));
+
+        //Emma watson should now be overused
+
+
         assertFalse("Emma Watson should not be overused", overusedConnections.contains("Emma Watson"));
 
-        System.out.println("User entry test completed.");
+        ArrayList<SingleConnection> orderPhoenixoveruse = orderPhoenixHP.overloadedLinksToPreviousMovie;
+
+        assertEquals("only emma should be overused", 1, orderPhoenixoveruse.size());
+        assertFalse("First movie should not be in last five anymore", play.lastFiveMovies.contains(philStoneHP));
+        assertTrue("But it should still be in previously played", play.moviesUsed.contains(philStoneHP.getMovieID()));
+
+
+
+
+
+        // add one more harry potter movie to make sure that alan rickman, daniel radcliffe is added to overuse
+
+        entryResult = play.userEntry(halfBloodHP);
+        assertEquals("Valid User Entry", entryResult);
+        assertTrue("Half-Blood Prince should be in lastFiveMovies", play.lastFiveMovies.contains(halfBloodHP));
+        assertTrue("Half-Blood Prince should be in moviesUsed", play.moviesUsed.contains(halfBloodHP.getMovieID()));
+
+        // chamber of secrets kicked
+        assertFalse("second movie should not be in last five anymore", play.lastFiveMovies.contains(chamberSecretsHP));
+        assertTrue("But it should still be in previously played", play.moviesUsed.contains(chamberSecretsHP.getMovieID()));
+
+
+        ArrayList<SingleConnection> halfBloodOveruse = halfBloodHP.overloadedLinksToPreviousMovie;
+
+
+        Set<String> overusedActorNames = new HashSet<>();
+        for (SingleConnection conn : halfBloodOveruse) {
+            if ("Actor".equals(conn.getConnectionType())) {
+                overusedActorNames.add(conn.getName());
+            }
+        }
+
+        // Verify Alan Rikman, Daniel Radcliffe, and Rupert Grint are in the overused list
+        //also Emma watson is STILL in there
+        assertTrue("Daniel Radcliffe should be overused", overusedActorNames.contains("Daniel Radcliffe"));
+        assertTrue("Alan Rickman should be overused", overusedActorNames.contains("Alan Rickman"));
+        assertTrue("Rupert Grint should be overused", overusedActorNames.contains("Rupert Grint"));
+        assertTrue("Emma should be overused", overusedActorNames.contains("Emma Watson"));
+
+        Player beforeLove = play.getActivePlayer();
+
+        // Now add love actually, which should NOT work because we used the alan rickman connection too many times
+
+        entryResult = play.userEntry(loveAckshually);
+
+        Player afterLove = play.getActivePlayer();
+
+        assertEquals("active player shoudl not change", beforeLove,afterLove);
+
+        assertEquals("We have attempted this connection too many times (alan rickman)",
+                "Connection made too many times", entryResult);
+
+        // Love Actually should NOT be added to lastFiveMovies
+        assertFalse("Love Actually should NOT be in lastFiveMovies", play.lastFiveMovies.contains(loveAckshually));
+
+        // Love Actually should NOT be added to moviesUsed
+        assertFalse("Love Actually should NOT be in moviesUsed", play.moviesUsed.contains(loveAckshually.getMovieID()));
+
+        // Check that the linksToPreviousMovie contains the overused connections (for UI display)
+        ArrayList<SingleConnection> loveActuallyLinks = loveAckshually.getLinksToPreviousMovie();
+        assertNotNull("Links to previous movie should not be null", loveActuallyLinks);
+        assertFalse("Links to previous movie should not be empty", loveActuallyLinks.isEmpty());
+
+
+
+        // Try Napoleon Dynamite (no valid connections
+        entryResult = play.userEntry(napDynamite);
+
+        // Should return an error message about no valid connection
+        assertEquals("No valid connection found between movies", entryResult);
+
+        // Napoleon Dynamite shouldn't be added to lastFiveMovies
+
+        Queue<Movie> lastFive = play.getLastFiveMovies();
+        assertFalse("Napoleon Dynamite should NOT be in lastFiveMovies", lastFive.contains(napDynamite));
+
+
+
+        // not in movies used
+        assertFalse("Napoleon Dynamite should NOT be in moviesUsed", play.moviesUsed.contains(napDynamite.getMovieID()));
+
+        // There should be no connections
+        ArrayList<SingleConnection> napDynamiteLinks = napDynamite.getLinksToPreviousMovie();
+
+        // links should be empty
+
+        assertTrue("Links to previous movie should be empty for Napoleon Dynamite", napDynamiteLinks.isEmpty());
+
+        Movie first = play.getFirstMovie();
+
+        assertEquals("first movie shouldn't change", philStoneHP, first);
+
+        assertEquals(play.getNumberOfRounds(), 6);
+
     }
 
 

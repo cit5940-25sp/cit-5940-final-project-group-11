@@ -46,6 +46,10 @@ public class Movie {
 
 
 
+    public void setCinematographers(HashSet<String> cinematographers) {
+        this.cinematographers = cinematographers;
+    }
+
     public String getMovieTitle() {
         return movieTitle;
     }
