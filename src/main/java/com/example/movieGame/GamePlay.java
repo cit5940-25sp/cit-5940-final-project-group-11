@@ -95,8 +95,8 @@ public class GamePlay
         }
 
         //randomly select movie
-        firstMovie = randomMovieSelection();
-        //firstMovie = moviesByTitle.get("titanic");
+        //firstMovie = randomMovieSelection();
+        firstMovie = moviesByTitle.get("titanic");
         lastFiveMovies.add(firstMovie);
         moviesUsed.add(firstMovie.getMovieID());
 

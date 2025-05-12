@@ -206,18 +206,6 @@
                     document.getElementById("player1ProgressTowardsWin").textContent = data.player1.progressTowardWin;
                     document.getElementById("player2ProgressTowardsWin").textContent = data.player2.progressTowardWin;
 
-                    /*
-                    //document.getElementById("winConditionDisplay").textContent = data.winCondition;
-                    const winConditionMap = {
-                        horror: "4 Horror Movies",
-                        comedy: "4 Comedies",
-                        action: "4 Action Movies",
-                        sciFi: "4 Science Fiction Movies",
-                        drama: "4 Dramas"
-                    };
-                    const readableWinCondition = winConditionMap[data.winCondition] || data.winCondition;
-                    document.getElementById("winConditionDisplay").textContent = readableWinCondition;
-                    */
                     let winConditionText = data.winCondition;
                     // Check if it's an actor win condition
                     if (winConditionText.startsWith("Actor: ")) {
