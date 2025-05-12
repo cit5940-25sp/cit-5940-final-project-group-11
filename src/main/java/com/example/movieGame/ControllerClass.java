@@ -116,6 +116,10 @@ public class ControllerClass {
             case "Connection made too many times" -> {
                 response.put("resultScreen", true);
                 response.put("reason", "Connection made too many times");
+                response.put("overloadedLinks", selectedMovie.getOverloadedLinks());
+                //String test = selectedMovie.getOverloadedLinks().toString();
+                //response.put("overloaded", test);
+
                 findWinnerAndLoser(response, gamePlay);
             }
             case "Valid User Entry" -> {

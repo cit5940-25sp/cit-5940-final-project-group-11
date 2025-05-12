@@ -1,5 +1,6 @@
 package com.example.movieGame;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -94,7 +95,11 @@ public class GamePlay
         }
 
         //randomly select movie
-        firstMovie = randomMovieSelection();
+        //firstMovie = randomMovieSelection();
+        firstMovie = moviesByTitle.get("titanic");
+        lastFiveMovies.add(firstMovie);
+        moviesUsed.add(firstMovie.getMovieID());
+
     }
 
 
@@ -267,34 +272,40 @@ public class GamePlay
                 movie.linksToPreviousMovie.clear(); // Clear any existing connections
             }
 
-            // Choose one connection to update usage counters
-            // In the game, we only need one valid connection, even though we display all
-            SingleConnection primaryConnection = result.getConnections().get(0);
+
+           // SingleConnection primaryConnection = result.getConnections().get(0);
 
             // Update the appropriate usage counter for the primary connection
-            String type = primaryConnection.getConnectionType();
-            String name = primaryConnection.getName();
 
-            switch (type) {
-                case "Actor":
-                    actorUsage.put(name, actorUsage.getOrDefault(name, 0) + 1);
-                    break;
-                case "Director":
-                    directorUsage.put(name, directorUsage.getOrDefault(name, 0) + 1);
-                    break;
-                case "Writer":
-                    writerUsage.put(name, writerUsage.getOrDefault(name, 0) + 1);
-                    break;
-                case "Cinematographer":
-                    cinematographerUsage.put(name, cinematographerUsage.getOrDefault(name, 0) + 1);
-                    break;
-                case "Composer":
-                    composerUsage.put(name, composerUsage.getOrDefault(name, 0) + 1);
-                    break;
+            for (SingleConnection connection : result.getConnections()) {
+                String type = connection.getConnectionType();
+                String name = connection.getName();
+
+                switch (type) {
+                    case "Actor":
+                        actorUsage.put(name, actorUsage.getOrDefault(name, 0) + 1);
+                        break;
+                    case "Director":
+                        directorUsage.put(name, directorUsage.getOrDefault(name, 0) + 1);
+                        break;
+                    case "Writer":
+                        writerUsage.put(name, writerUsage.getOrDefault(name, 0) + 1);
+                        break;
+                    case "Cinematographer":
+                        cinematographerUsage.put(name, cinematographerUsage.getOrDefault(name, 0) + 1);
+                        break;
+                    case "Composer":
+                        composerUsage.put(name, composerUsage.getOrDefault(name, 0) + 1);
+                        break;
+                }
             }
+
+
+
 
             // Store all valid connections for display
             movie.linksToPreviousMovie.addAll(result.getConnections());
+            movie.overloadedLinksToPreviousMovie.addAll(result.getOverusedConnections());
         }
 
         // Add movie to used list
@@ -364,7 +375,7 @@ public class GamePlay
 
         // We'll collect all valid connections AND overused connections
         List<SingleConnection> validConnections = new ArrayList<>();
-        List<SingleConnection> overusedConnections = new ArrayList<>();
+        ArrayList<SingleConnection> overusedConnections = new ArrayList<>();
 
         boolean foundAnyConnection = false;
         //boolean foundOverusedConnection = false;
@@ -444,7 +455,7 @@ public class GamePlay
         /*if (validConnections.isEmpty()) {
             return MoveResult.failure("No valid connection found between movies");
         }*/
-
+        movie.setOverloadedLinks(overusedConnections);
         if (!validConnections.isEmpty()) {
             return MoveResult.success(validConnections,overusedConnections);
         }
@@ -542,7 +553,16 @@ public class GamePlay
         //Set the winCondition as what is entered in the UI
         //Define the strategy based on the entered genre
         this.winCondition = winCondition;
-        this.winStrategy = new GenreWinStrategy(winCondition);
+
+        if (winCondition.toLowerCase().startsWith("actor:")) {
+            String actorName = winCondition.substring(6).trim();  // skip "Actor:"
+            this.winStrategy = new ActorWinStrategy(actorName);
+        } else {
+            this.winStrategy = new GenreWinStrategy(winCondition);
+        }
+
+
+        //this.winStrategy = new GenreWinStrategy(winCondition);
 
     }
 
