@@ -191,7 +191,6 @@ public class MovieLoaderTest {
     }
 
 
-    /*
     @Test
     public void testFindingConnection() throws IOException {
         // Load movie data
@@ -205,9 +204,7 @@ public class MovieLoaderTest {
 
         Movie interstellar = movieOutputs.get(1474); // Pirates of the Caribbean: Dead Man's Chest
 
-
         System.out.println(interstellar);
-
         System.out.println(pirates1);
         System.out.println(pirates2);
 
@@ -228,8 +225,6 @@ public class MovieLoaderTest {
         HashSet<String> sharedDirectors = new HashSet<>(pirates1.getDirectors());
         sharedDirectors.retainAll(pirates2.getDirectors());
         System.out.println("Shared directors: " + sharedDirectors);
-
-
 
         // Create a custom GamePlay for testing
         GamePlay play = new GamePlay("P1", "P2");
@@ -275,6 +270,4 @@ public class MovieLoaderTest {
         }
 
     }
-
-     */
 }
