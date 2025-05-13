@@ -22,20 +22,20 @@ public class AutocompleteTest {
         //EXPECTED
         //manually build nodes (add terms and weights)
         Node expected = new Node();
-        expected.getReferences()[19] = new Node("t",0);   //t
-        expected.getReferences()[19].getReferences()[4] = new Node("te",0);    //te
-        expected.getReferences()[19].getReferences()[4].getReferences()[18] =
+        expected.getReferences()[116] = new Node("t",0);   //t
+        expected.getReferences()[116].getReferences()[101] = new Node("te",0);    //te
+        expected.getReferences()[116].getReferences()[101].getReferences()[115] =
                 new Node("tes",0); //tes
-        expected.getReferences()[19].getReferences()[4].getReferences()[18].getReferences()[19] =
+        expected.getReferences()[116].getReferences()[101].getReferences()[115].getReferences()[116] =
                 new Node("test",7); //test
         //add Words
-        expected.getReferences()[19].getReferences()[4].getReferences()[18].
-                getReferences()[19].setWords(1); //test
+        expected.getReferences()[116].getReferences()[101].getReferences()[115].
+                getReferences()[116].setWords(1); //test
         //add Prefixes
-        expected.getReferences()[19].setPrefixes(1);   //t
-        expected.getReferences()[19].getReferences()[4].setPrefixes(1);   //te
-        expected.getReferences()[19].getReferences()[4].getReferences()[18].setPrefixes(1); //tes
-        expected.getReferences()[19].getReferences()[4].getReferences()[18].getReferences()[19].
+        expected.getReferences()[116].setPrefixes(1);   //t
+        expected.getReferences()[116].getReferences()[101].setPrefixes(1);   //te
+        expected.getReferences()[116].getReferences()[101].getReferences()[115].setPrefixes(1); //tes
+        expected.getReferences()[116].getReferences()[101].getReferences()[115].getReferences()[116].
                 setPrefixes(1);//test
 
         //ACTUAL
@@ -56,24 +56,24 @@ public class AutocompleteTest {
         //EXPECTED
         //manually build nodes (add terms and weights)
         Node expected = new Node();
-        expected.getReferences()[19] = new Node("t",0);   //t
-        expected.getReferences()[19].getReferences()[4] = new Node("te",0);    //te
-        expected.getReferences()[19].getReferences()[4].getReferences()[18] =
+        expected.getReferences()[116] = new Node("t",0);   //t
+        expected.getReferences()[116].getReferences()[101] = new Node("te",0);    //te
+        expected.getReferences()[116].getReferences()[101].getReferences()[115] =
                 new Node("tes",0); //tes
-        expected.getReferences()[19].getReferences()[4].getReferences()[18].getReferences()[19] =
+        expected.getReferences()[116].getReferences()[101].getReferences()[115].getReferences()[116] =
                 new Node("test",7); //test
-        expected.getReferences()[19].getReferences()[19] = new Node("tt",3);    //tt
+        expected.getReferences()[116].getReferences()[116] = new Node("tt",3);    //tt
         //add Words
-        expected.getReferences()[19].getReferences()[4].getReferences()[18].
-                getReferences()[19].setWords(1); //test
-        expected.getReferences()[19].getReferences()[19].setWords(1); //tt
+        expected.getReferences()[116].getReferences()[101].getReferences()[115].
+                getReferences()[116].setWords(1); //test
+        expected.getReferences()[116].getReferences()[116].setWords(1); //tt
         //add Prefixes
-        expected.getReferences()[19].setPrefixes(2);   //t
-        expected.getReferences()[19].getReferences()[4].setPrefixes(1);   //te
-        expected.getReferences()[19].getReferences()[4].getReferences()[18].setPrefixes(1); //tes
-        expected.getReferences()[19].getReferences()[4].getReferences()[18].getReferences()[19].
+        expected.getReferences()[116].setPrefixes(2);   //t
+        expected.getReferences()[116].getReferences()[101].setPrefixes(1);   //te
+        expected.getReferences()[116].getReferences()[101].getReferences()[115].setPrefixes(1); //tes
+        expected.getReferences()[116].getReferences()[101].getReferences()[115].getReferences()[116].
                 setPrefixes(1);//test
-        expected.getReferences()[19].getReferences()[19].setPrefixes(1);   //tt
+        expected.getReferences()[116].getReferences()[116].setPrefixes(1);   //tt
 
         //ACTUAL
         //create a currentNode and rootNode
@@ -98,41 +98,41 @@ public class AutocompleteTest {
         //EXPECTED
         //manually build tree (add terms and weights)
         Node expected = new Node();
-        expected.getReferences()[2] = new Node("c",0);   //c
-        expected.getReferences()[2].getReferences()[11] = new Node("cl",0);    //cl
-        expected.getReferences()[2].getReferences()[11].getReferences()[0] =
+        expected.getReferences()[99] = new Node("c",0);   //c
+        expected.getReferences()[99].getReferences()[108] = new Node("cl",0);    //cl
+        expected.getReferences()[99].getReferences()[108].getReferences()[97] =
                 new Node("cla",0); //cla
-        expected.getReferences()[2].getReferences()[11].getReferences()[0].getReferences()[2] =
+        expected.getReferences()[99].getReferences()[108].getReferences()[97].getReferences()[99] =
                 new Node("clac",0); //clac
-        expected.getReferences()[2].getReferences()[11].getReferences()[0].getReferences()[2]
-                .getReferences()[10] = new Node("clack",1); //clack
-        expected.getReferences()[2].getReferences()[11].getReferences()[0].getReferences()[2]
-                .getReferences()[10].getReferences()[18] = new Node("clacks",3); //clacks
-        expected.getReferences()[2].getReferences()[11].getReferences()[0].getReferences()[18]
+        expected.getReferences()[99].getReferences()[108].getReferences()[97].getReferences()[99]
+                .getReferences()[107] = new Node("clack",1); //clack
+        expected.getReferences()[99].getReferences()[108].getReferences()[97].getReferences()[99]
+                .getReferences()[107].getReferences()[115] = new Node("clacks",3); //clacks
+        expected.getReferences()[99].getReferences()[108].getReferences()[97].getReferences()[115]
                 = new Node("clas",0); //clas
-        expected.getReferences()[2].getReferences()[11].getReferences()[0].getReferences()[18]
-                .getReferences()[18] = new Node("class",10); //class
+        expected.getReferences()[99].getReferences()[108].getReferences()[97].getReferences()[115]
+                .getReferences()[115] = new Node("class",10); //class
         //add Words
-        expected.getReferences()[2].getReferences()[11].getReferences()[0].getReferences()[2]
-                .getReferences()[10].setWords(1); //clack
-        expected.getReferences()[2].getReferences()[11].getReferences()[0].getReferences()[2]
-                .getReferences()[10].getReferences()[18].setWords(1); //clacks
-        expected.getReferences()[2].getReferences()[11].getReferences()[0].getReferences()[18]
-                .getReferences()[18].setWords(1); //class
+        expected.getReferences()[99].getReferences()[108].getReferences()[97].getReferences()[99]
+                .getReferences()[107].setWords(1); //clack
+        expected.getReferences()[99].getReferences()[108].getReferences()[97].getReferences()[99]
+                .getReferences()[107].getReferences()[115].setWords(1); //clacks
+        expected.getReferences()[99].getReferences()[108].getReferences()[97].getReferences()[115]
+                .getReferences()[115].setWords(1); //class
         //add Prefixes
-        expected.getReferences()[2].setPrefixes(3);   //c
-        expected.getReferences()[2].getReferences()[11].setPrefixes(3);   //cl
-        expected.getReferences()[2].getReferences()[11].getReferences()[0].setPrefixes(3); //cla
-        expected.getReferences()[2].getReferences()[11].getReferences()[0].getReferences()[2]
+        expected.getReferences()[99].setPrefixes(3);   //c
+        expected.getReferences()[99].getReferences()[108].setPrefixes(3);   //cl
+        expected.getReferences()[99].getReferences()[108].getReferences()[97].setPrefixes(3); //cla
+        expected.getReferences()[99].getReferences()[108].getReferences()[97].getReferences()[99]
                 .setPrefixes(2);//clac
-        expected.getReferences()[2].getReferences()[11].getReferences()[0].getReferences()[2]
-                .getReferences()[10].setPrefixes(2); //clack
-        expected.getReferences()[2].getReferences()[11].getReferences()[0].getReferences()[2]
-                .getReferences()[10].getReferences()[18].setPrefixes(1); //clacks
-        expected.getReferences()[2].getReferences()[11].getReferences()[0].getReferences()[18]
+        expected.getReferences()[99].getReferences()[108].getReferences()[97].getReferences()[99]
+                .getReferences()[107].setPrefixes(2); //clack
+        expected.getReferences()[99].getReferences()[108].getReferences()[97].getReferences()[99]
+                .getReferences()[107].getReferences()[115].setPrefixes(1); //clacks
+        expected.getReferences()[99].getReferences()[108].getReferences()[97].getReferences()[115]
                 .setPrefixes(1); //clas
-        expected.getReferences()[2].getReferences()[11].getReferences()[0].getReferences()[18]
-                .getReferences()[18].setPrefixes(1); //class
+        expected.getReferences()[99].getReferences()[108].getReferences()[97].getReferences()[115]
+                .getReferences()[115].setPrefixes(1); //class
 
         //ACTUAL
         Autocomplete autocomplete = new Autocomplete();
@@ -151,16 +151,16 @@ public class AutocompleteTest {
         //EXPECTED
         //manually build tree (add terms and weights)
         Node expected = new Node();
-        expected.getReferences()[25] = new Node("z",0);   //z
-        expected.getReferences()[25].getReferences()[25] = new Node("zz",0);    //z
-        expected.getReferences()[25].getReferences()[25].getReferences()[0] =
+        expected.getReferences()[122] = new Node("z",0);   //z
+        expected.getReferences()[122].getReferences()[122] = new Node("zz",0);    //z
+        expected.getReferences()[122].getReferences()[122].getReferences()[97] =
                 new Node("zza",3);//a
         //add Words
-        expected.getReferences()[25].getReferences()[25].getReferences()[0].setWords(1); //zza
+        expected.getReferences()[122].getReferences()[122].getReferences()[97].setWords(1); //zza
         //add Prefixes
-        expected.getReferences()[25].setPrefixes(1);   //z
-        expected.getReferences()[25].getReferences()[25].setPrefixes(1);   //z
-        expected.getReferences()[25].getReferences()[25].getReferences()[0].setPrefixes(1); //a
+        expected.getReferences()[122].setPrefixes(1);   //z
+        expected.getReferences()[122].getReferences()[122].setPrefixes(1);   //z
+        expected.getReferences()[122].getReferences()[122].getReferences()[97].setPrefixes(1); //a
 
         //ACTUAL
         Autocomplete autocomplete = new Autocomplete();
@@ -184,25 +184,25 @@ public class AutocompleteTest {
         //expected.getReferences()[2].getReferences()[11] = new Node("cl",0);    //cl
         //expected.getReferences()[2].getReferences()[11].getReferences()[0]
         // = new Node("cla",0); //cla
-        expected.getReferences()[2] = new Node("clac",0); //clac
-        expected.getReferences()[2].getReferences()[10] = new Node("clack",1); //clack
-        expected.getReferences()[2].getReferences()[10].getReferences()[18] =
+        expected.getReferences()[99] = new Node("clac",0); //clac
+        expected.getReferences()[99].getReferences()[107] = new Node("clack",1); //clack
+        expected.getReferences()[99].getReferences()[107].getReferences()[115] =
                 new Node("clacks",3); //clacks
-        expected.getReferences()[18] = new Node("clas",0); //clas
-        expected.getReferences()[18].getReferences()[18] = new Node("class",10); //class
+        expected.getReferences()[115] = new Node("clas",0); //clas
+        expected.getReferences()[115].getReferences()[115] = new Node("class",10); //class
         //add Words
-        expected.getReferences()[2].getReferences()[10].setWords(1); //clack
-        expected.getReferences()[2].getReferences()[10].getReferences()[18].setWords(1); //clacks
-        expected.getReferences()[18].getReferences()[18].setWords(1); //class
+        expected.getReferences()[99].getReferences()[107].setWords(1); //clack
+        expected.getReferences()[99].getReferences()[107].getReferences()[115].setWords(1); //clacks
+        expected.getReferences()[115].getReferences()[115].setWords(1); //class
         //add Prefixes
         //expected.getReferences()[2].setPrefixes(3);   //c
         //expected.getReferences()[2].getReferences()[11].setPrefixes(3);   //cl
         expected.setPrefixes(3); //cla
-        expected.getReferences()[2].setPrefixes(2);//clac
-        expected.getReferences()[2].getReferences()[10].setPrefixes(2); //clack
-        expected.getReferences()[2].getReferences()[10].getReferences()[18].setPrefixes(1);//clacks
-        expected.getReferences()[18].setPrefixes(1); //clas
-        expected.getReferences()[18].getReferences()[18].setPrefixes(1); //class
+        expected.getReferences()[99].setPrefixes(2);//clac
+        expected.getReferences()[99].getReferences()[107].setPrefixes(2); //clack
+        expected.getReferences()[99].getReferences()[107].getReferences()[115].setPrefixes(1);//clacks
+        expected.getReferences()[115].setPrefixes(1); //clas
+        expected.getReferences()[115].getReferences()[115].setPrefixes(1); //class
 
         //ACTUAL
         Autocomplete autocomplete = new Autocomplete();

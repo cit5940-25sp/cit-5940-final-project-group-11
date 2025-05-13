@@ -27,6 +27,22 @@ public class MovieLoader {
     private static Map<Integer, String> title;
     private static Map<Integer, Long> year;
     private static Map<Integer, List<String>> genreSet;
+    private static boolean loaded = false;
+
+    public static void loadAllDataIfNeeded() {
+        if (!loaded) {
+            try {
+                creditCSVRead();
+                moviesCSVRead();
+                createMovieFromFiles();
+                loaded = true;
+                System.out.println("✅ Movie and credit data loaded into memory.");
+            } catch (IOException e) {
+                System.err.println("❌ Failed to load movie data.");
+                e.printStackTrace();
+            }
+        }
+    }
 
 
     /**
@@ -262,4 +278,6 @@ public class MovieLoader {
     public static HashSet<String> getActorHashSet() {
         return actorSet;
     }
+
+
 }
