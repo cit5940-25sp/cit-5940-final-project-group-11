@@ -16,7 +16,7 @@ public class GamePlay {
     boolean gameEnded = false;
 
     //Index Maps
-    private Map<String, Movie> moviesByTitle;
+    private Map<Integer, Movie> moviesByTitle;
 
     //Usage Maps
     private Map<String, Integer> actorUsage = new HashMap<>();      // Maps actor name to usage count
@@ -90,7 +90,7 @@ public class GamePlay {
 
         //randomly select movie
         //firstMovie = randomMovieSelection();
-        firstMovie = moviesByTitle.get("titanic");
+        firstMovie = moviesByTitle.get(597); // titanic
         lastFiveMovies.add(firstMovie);
         moviesUsed.add(firstMovie.getMovieID());
     }
@@ -117,7 +117,7 @@ public class GamePlay {
         for (Movie movie : availableMovies) {
 
             // Add to forward index
-            moviesByTitle.put(movie.getMovieTitle().toLowerCase(), movie);
+            moviesByTitle.put(movie.getMovieID(), movie);
 
             // create autocomplete trie
             String titleAndYear = movie.getMovieTitle().toLowerCase() + ", " + movie.getReleaseYear();
