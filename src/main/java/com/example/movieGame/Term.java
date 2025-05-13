@@ -1,5 +1,8 @@
 package com.example.movieGame;
 
+/**
+ * Used in autocomplete to track terms used in Nodes
+ */
 public class Term implements ITerm {
 
     private String term;
@@ -68,7 +71,6 @@ public class Term implements ITerm {
      * Setter to set the weight of the term
      *
      * @param weight weight of the term to set
-     * @return weight of the term
      */
     @Override
     public void setWeight(long weight) {

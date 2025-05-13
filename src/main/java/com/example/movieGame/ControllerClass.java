@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 
+
 /**
  * Tracks logic of gameplay. Handles actions that trigger changes to the UI
  * Created using ChatGPT prompting for help managing SpringBoot
@@ -33,6 +34,13 @@ public class ControllerClass {
      * Initiates game setup
      * Takes in the players' names and allows the user to select the win condition
      *
+     * @param player1 player 1 name
+     * @param player2 player 2 name
+     * @param winCondition win condition selected by user
+     * @param session http session
+     * @param model model
+     * @return string with info
+     *
      */
     @PostMapping("/setup")
     public String handleSetup(
@@ -46,6 +54,7 @@ public class ControllerClass {
             model.addAttribute("error", "Missing input");
             return "ViewUI";
         }
+
 
         GamePlay gamePlay = new GamePlay(player1, player2);
         gamePlay.setWinCondition(winCondition);
@@ -99,6 +108,10 @@ public class ControllerClass {
     /**
      * Tracks logic of gameplay. Handles actions that trigger changes to the UI
      * Created using ChatGPT prompting for help managing SpringBoot
+     *
+     * @return returns map with information
+     * @param movieId id of movie user selected
+     * @param session http session
      *
      */
     @PostMapping("/submitMovie")
@@ -212,6 +225,20 @@ public class ControllerClass {
                     return map;
                 })
                 .toList();
+    }
+
+    @GetMapping("/validateActor")
+    @ResponseBody
+    public boolean validateActor(@RequestParam("actorName") String actorName, HttpSession session) {
+        GamePlay gamePlay = (GamePlay) session.getAttribute("gamePlay");
+        if (gamePlay == null || actorName == null || actorName.trim().isEmpty()) {
+            return false;
+        }
+
+        String normalizedInput = actorName.trim().toLowerCase();
+        return gamePlay.getActorHashSet().stream()
+                .map(String::toLowerCase)
+                .anyMatch(actor -> actor.equals(normalizedInput));
     }
 
 

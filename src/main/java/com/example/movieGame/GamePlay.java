@@ -12,12 +12,6 @@ public class GamePlay
 {
     ArrayList<Integer> moviesUsed; //list of movie IDs ot track if it's been used before
 
-    private int actorConnectionUsage; //# of times an actor connection has been made;
-    private int directorConnectionUsage; //# of times a director connection has been made;
-    private int writerConnectionUsage; //# of times a writer connection has been made;
-    private int cinematographerConnectionUsage; //# of times a cinematographer connection has been made;
-    private int composerConnectionUsage; //# of times a composer connection has been made;
-
     //Win Strategy tracker
     private WinStrategy winStrategy;
     boolean gameEnded = false;
@@ -31,11 +25,9 @@ public class GamePlay
     private Map<String, Integer> writerUsage = new HashMap<>();     // Maps writer name to usage count
     private Map<String, Integer> cinematographerUsage = new HashMap<>(); // Maps cinematographer to usage count
     private Map<String, Integer> composerUsage = new HashMap<>();   // Maps composer name to usage count
+    private HashSet<String> actorSet = new HashSet<>(); //tracks all actors in the database
 
     private int numberOfRounds; //tracks # of rounds played (for display)
-
-    //Queue<Movie> lastFiveMovies; //LinkedList of movie objects showing last 5 (FIFO)
-    //Movie firstMovie; //first randomly selected movie
 
     private Timer gameTimer;
 
@@ -43,7 +35,7 @@ public class GamePlay
 
     Queue<Movie> lastFiveMovies; //LinkedList of movie objects showing last 5 (FIFO)
     private Movie firstMovie; //first randomly selected movie
-    private String winCondition; //TODO move this to Win class once it's set up
+    private String winCondition;
 
     private Player player1;
     private Player player2;
@@ -68,12 +60,6 @@ public class GamePlay
         moviesUsed = new ArrayList<>();
         Map<String, Integer> connectionsUsageMap;
 
-        actorConnectionUsage = 0;
-        directorConnectionUsage = 0;
-        writerConnectionUsage = 0;
-        cinematographerConnectionUsage = 0;
-        composerConnectionUsage = 0;
-
         numberOfRounds = 0;
         lastFiveMovies = new LinkedList<>();
 
@@ -87,6 +73,7 @@ public class GamePlay
             MovieLoader.moviesCSVRead();
             availableMovies = MovieLoader.createMovieFromFiles();
             availableMoviesHashMap = MovieLoader.getMoviesHashMap(); //used to look up movie object after pulling from autocomplete
+            actorSet = MovieLoader.getActorHashSet();
 
             // build the index after loading the movies
             buildIndex();
@@ -118,11 +105,6 @@ public class GamePlay
             // create autocomplete trie
             String titleAndYear = movie.getMovieTitle().toLowerCase() + ", " + movie.getReleaseYear();
             autocomplete.addWord(titleAndYear, movie.getMovieID());
-            //TODO: note - tolowercase functionality here/in autocomplete means dropdown shows as all lowercase
-            // to show camelCase in teh dropdown, could change weight to be a string that records the camel case title
-            // and return that instead of the all lowercase version...actually that may not work...regardless,
-            // think we should should leave as-is and only come back to it later if we have time
-
         }
     }
 
@@ -130,6 +112,7 @@ public class GamePlay
     /**
      * Selects first move for the start of the game
      *
+     * @return returns the movie object randomly selected
      */
     public Movie randomMovieSelection() {
 
@@ -527,6 +510,15 @@ public class GamePlay
      */
     public String getWinCondition() {
         return winCondition;
+    }
+
+    /**
+     * Getter for actor hashset
+     *
+     * @return win condition selected by user
+     */
+    public HashSet<String> getActorHashSet() {
+        return actorSet;
     }
 
     /**

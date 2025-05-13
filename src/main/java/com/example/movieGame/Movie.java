@@ -29,6 +29,15 @@ public class Movie {
     /**
      * Constructor to create the Movie object and initialize variables
      *
+     * @param title movie title
+     * @param movieID movie id
+     * @param releaseYear movie release year
+     * @param genre genre of movie
+     * @param actors
+     * @param directors
+     * @param writers
+     * @param cinematographers
+     * @param composers
      */
     public Movie(String title, int movieID, Long releaseYear, HashSet<String> genre, HashSet<String> actors, HashSet<String> directors, HashSet<String> writers,
                  HashSet<String> cinematographers, HashSet<String> composers) {
@@ -45,8 +54,6 @@ public class Movie {
         this.linksToPreviousMovie = new ArrayList<>();
         this.overloadedLinksToPreviousMovie = new ArrayList<>();
     }
-
-
 
 
     /**

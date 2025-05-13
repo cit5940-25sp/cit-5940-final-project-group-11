@@ -18,6 +18,7 @@ public class MovieLoader {
     private static List<Movie> movies;
     private static HashMap<Integer, Movie> moviesHashMap;
     private static HashSet<Integer> idSet;
+    private static HashSet<String> actorSet; //for actor win condition user entry checking
     private static Map<Integer, List<String>> actorMap;
     private static Map<Integer, List<String>> directorMap;
     private static Map<Integer, List<String>> writerMap;
@@ -32,7 +33,7 @@ public class MovieLoader {
      * Loads in the credit csv file, stores the details in hashmaps.
      * Then sets the cast/crew data into JSON arrays and iterates through
      * Each type of cast/crew is added to hashmap.
-     * @throws throws IOException if there's an issue reading the file
+     * @throws IOException if there's an issue reading the file
      */
     public static void creditCSVRead() throws IOException {
 
@@ -49,6 +50,7 @@ public class MovieLoader {
         cinematographerMap = new HashMap<>();
         composerMap = new HashMap<>();
         idSet = new HashSet<>();
+        actorSet = new HashSet<>();
 
         //Create string for one row of the spreadsheet
         StringBuilder rowBuilder = new StringBuilder();
@@ -86,6 +88,7 @@ public class MovieLoader {
             for (int i = 0; i < castArray.length(); i++) {
                 JSONObject castMember = castArray.getJSONObject(i);
                 actorNames.add(castMember.getString("name"));
+                actorSet.add(castMember.getString("name"));
             }
             actorMap.put(id, actorNames);
 
@@ -127,7 +130,7 @@ public class MovieLoader {
      * Loads in the movies csv file, stores the details in hashmaps.
      * Extracts the id, year, and genre
      *
-     * @throws throws IOException if there's an issue reading the file
+     * @throws IOException if there's an issue reading the file
      */
     public static void moviesCSVRead() throws IOException {
 
@@ -248,5 +251,15 @@ public class MovieLoader {
      */
     public static HashMap<Integer, Movie> getMoviesHashMap() {
         return moviesHashMap;
+    }
+
+    /**
+     * Getter for actor hashset
+     * Used to look up the corresponding movie object (based on its id) after pulling it from autocomplete
+     *
+     * @return returns the hashset of movies objects
+     */
+    public static HashSet<String> getActorHashSet() {
+        return actorSet;
     }
 }

@@ -268,31 +268,71 @@
 
         //submits the setup
         function submitSetup() {
-            const player1 = document.getElementById("player1Name").value;  //this stores the name the user types in Player#1 input field
-            const player2 = document.getElementById("player2Name").value;
-            const actorInput = document.getElementById("actorWinCondition").value.trim();
+            const player1 = document.getElementById("player1Name").value.trim();
+            const player2 = document.getElementById("player2Name").value.trim();
+            const actorInputRaw = document.getElementById("actorWinCondition").value.trim();
             const genreInput = document.getElementById("winCondition").value;
-            const winCondition = actorInput !== "" ? `Actor: ${actorInput}` : genreInput;
+            const winCondition = actorInputRaw !== "" ? `Actor: ${actorInputRaw}` : genreInput;
 
-            if (!player1 || !player2 || !winCondition) {
-                alert("Please enter both names and select a win condition.");
-                return;
+            // Validate actor first (if actor input is used)
+            if (actorInputRaw !== "") {
+                fetch(`/validateActor?actorName=${encodeURIComponent(actorInputRaw)}`)
+                    .then(res => res.json())
+                    .then(isValid => {
+                        if (!isValid) {
+                            alert("Actor not found. Please enter a different actor.");
+                            return;
+                        }
+
+                        // Proceed with other validations
+                        if (!player1 || !player2) {
+                            alert("Please enter both player names.");
+                            return;
+                        }
+
+                        // If actor is valid and names are present, start the game
+                        fetch("/setup", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                            body: `player1=${encodeURIComponent(player1)}&player2=${encodeURIComponent(player2)}&winCondition=${encodeURIComponent(winCondition)}`
+                        })
+                            .then(response => {
+                                if (response.ok) {
+                                    showScreen('gameScreen');
+                                    loadGameData();
+                                } else {
+                                    alert("There was an error setting up the game.");
+                                }
+                            });
+                    })
+                    .catch(err => {
+                        alert("Error validating actor. Please try again.");
+                        console.error(err);
+                    });
+            } else {
+                // Genre flow: validate names then continue
+                if (!player1 || !player2 || !genreInput) {
+                    alert("Please enter both names and select a genre.");
+                    return;
+                }
+
+                fetch("/setup", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `player1=${encodeURIComponent(player1)}&player2=${encodeURIComponent(player2)}&winCondition=${encodeURIComponent(winCondition)}`
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            showScreen('gameScreen');
+                            loadGameData();
+                        } else {
+                            alert("There was an error. Please try again.");
+                        }
+                    });
             }
-
-            fetch("/setup", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: `player1=${encodeURIComponent(player1)}&player2=${encodeURIComponent(player2)}&winCondition=${encodeURIComponent(winCondition)}`
-            })
-                .then(response => {
-                    if (response.ok) {
-                        showScreen('gameScreen');
-                        loadGameData();
-                    } else {
-                        alert("There was an error. Please try again.");
-                    }
-                });
         }
+
+
     </script>
 </head>
 
