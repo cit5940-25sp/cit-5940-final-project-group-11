@@ -1,10 +1,7 @@
 package com.example.movieGame;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * Movie object tracks information about each movie (title, ID, actors, directors, writers, composers, release year, genre etc)
@@ -167,5 +164,22 @@ public class Movie {
      */
     public void setOverloadedLinks(ArrayList<SingleConnection> overusedConnections) {
         this.overloadedLinksToPreviousMovie = overusedConnections;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Movie movie = (Movie) o;
+        return movieID == movie.movieID;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(movieID);
     }
 }
