@@ -123,7 +123,7 @@ public class GamePlayTest {
 
         MovieLoader.creditCSVRead();
         MovieLoader.moviesCSVRead();
-        List<Movie> movieList = MovieLoader.createMovieFromFiles(); // THIS WAS MISSING
+        List<Movie> movieList = MovieLoader.createMovieFromFiles();
 
         HashMap<Integer, Movie> movieMap = MovieLoader.getMoviesHashMap();
         GamePlay gamePlay = new GamePlay("P1", "P2");

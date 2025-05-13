@@ -128,15 +128,16 @@ public class GamePlay {
 
         // iterate over all movies
         for (Movie movie : availableMovies) {
-            // Add to forward index (existing code)
+
+            // Add to forward index
             moviesByTitle.put(movie.getMovieTitle().toLowerCase(), movie);
 
-            // create autocomplete trie (existing code)
+            // create autocomplete trie
             String titleAndYear = movie.getMovieTitle().toLowerCase() + ", " + movie.getReleaseYear();
             autocomplete.addWord(titleAndYear, movie.getMovieID());
 
 
-            // Add to backward indexes (new code)
+            // Add to backward indexes
 
             // Add to actors index
             for (String actor : movie.getActors()) {
@@ -500,12 +501,14 @@ public class GamePlay {
 
 
     public MoveResult validateMove(Movie movie) {
-        // Check if movie has been used already
+
+
+        // Check if movie already used
         if (moviesUsed.contains(movie.getMovieID())) {
             return MoveResult.failure("Movie already used");
         }
 
-        // Get the previous movie to compare against
+        // get previous movie to compare with
         Movie previousMovie = null;
         if (!lastFiveMovies.isEmpty()) {
             previousMovie = ((LinkedList<Movie>) lastFiveMovies).getLast();
@@ -515,18 +518,21 @@ public class GamePlay {
             return MoveResult.failure("No previous movie to connect to");
         }
 
-        // We'll collect all valid connections AND overused connections
+        // Get all valid and overused connections
         List<SingleConnection> validConnections = new ArrayList<>();
         ArrayList<SingleConnection> overusedConnections = new ArrayList<>();
+        // Set this boolean, to be used for movies with only ONE valid connection that is overused
         boolean foundAnyConnection = false;
 
-        // Check actors - using backward index
+        // Check actors using the index
         for (String actor : previousMovie.getActors()) {
             if (moviesByActor.containsKey(actor)) {
                 Set<Movie> moviesWithActor = moviesByActor.get(actor);
                 if (moviesWithActor.contains(movie)) {
                     foundAnyConnection = true;
                     int usage = actorUsage.getOrDefault(actor, 0);
+
+                    // Depending on the usage, add to correct respective list as a single connection
                     if (usage < 3) {
                         validConnections.add(new SingleConnection("Actor", actor));
                     } else {
@@ -536,7 +542,7 @@ public class GamePlay {
             }
         }
 
-        // Check directors - using backward index
+        // Check directors
         for (String director : previousMovie.getDirectors()) {
             if (moviesByDirector.containsKey(director)) {
                 Set<Movie> moviesWithDirector = moviesByDirector.get(director);
@@ -552,7 +558,7 @@ public class GamePlay {
             }
         }
 
-        // Check writers - using backward index
+        // Check writers
         for (String writer : previousMovie.getWriters()) {
             if (moviesByWriter.containsKey(writer)) {
                 Set<Movie> moviesWithWriter = moviesByWriter.get(writer);
@@ -568,7 +574,7 @@ public class GamePlay {
             }
         }
 
-        // Check cinematographers - using backward index
+        // Check cinematographers
         for (String cinematographer : previousMovie.getCinematographers()) {
             if (moviesByCinematographer.containsKey(cinematographer)) {
                 Set<Movie> moviesWithCinematographer = moviesByCinematographer.get(cinematographer);
@@ -584,7 +590,7 @@ public class GamePlay {
             }
         }
 
-        // Check composers - using backward index
+        // Check composers
         for (String composer : previousMovie.getComposers()) {
             if (moviesByComposer.containsKey(composer)) {
                 Set<Movie> moviesWithComposer = moviesByComposer.get(composer);
@@ -600,14 +606,16 @@ public class GamePlay {
             }
         }
 
-        // Store the overused connections for display
+        // Store the overused connections to display
         movie.setOverloadedLinks(overusedConnections);
 
-        // Determine result based on connections found
+        // Determine if valid
         if (!validConnections.isEmpty()) {
             return MoveResult.success(validConnections, overusedConnections);
         }
 
+
+        // If no valid connections, BUT we have found a connection, we know it was used too many times
         if (foundAnyConnection) {
             return MoveResult.failure("Connection made too many times", overusedConnections);
         }
@@ -739,97 +747,6 @@ public class GamePlay {
     }
 
 
-    public Set<Movie> findMoviesWithSharedComposers(Movie movie) {
-        Set<Movie> connectedMovies = new HashSet<>();
-
-        for (String composer : movie.getComposers()) {
-            if (moviesByComposer.containsKey(composer)) {
-                connectedMovies.addAll(moviesByComposer.get(composer));
-            }
-        }
-
-        // Remove the original movie from the result set
-        connectedMovies.remove(movie);
-
-        // Remove already used movies
-        connectedMovies.removeIf(m -> moviesUsed.contains(m.getMovieID()));
-
-        return connectedMovies;
-    }
-
-    public Set<Movie> findMoviesWithSharedActors(Movie movie) {
-        Set<Movie> connectedMovies = new HashSet<>();
-
-        for (String actor : movie.getActors()) {
-            if (moviesByActor.containsKey(actor)) {
-                connectedMovies.addAll(moviesByActor.get(actor));
-            }
-        }
-
-        // Remove the original movie from the result set
-        connectedMovies.remove(movie);
-
-        // Remove already used movies
-        connectedMovies.removeIf(m -> moviesUsed.contains(m.getMovieID()));
-
-        return connectedMovies;
-    }
-
-
-    public Set<Movie> findMoviesWithSharedDirectors(Movie movie) {
-        Set<Movie> connectedMovies = new HashSet<>();
-
-        for (String director : movie.getDirectors()) {
-            if (moviesByDirector.containsKey(director)) {
-                connectedMovies.addAll(moviesByDirector.get(director));
-            }
-        }
-
-        // Remove the original movie from the result set
-        connectedMovies.remove(movie);
-
-        // Remove already used movies
-        connectedMovies.removeIf(m -> moviesUsed.contains(m.getMovieID()));
-
-        return connectedMovies;
-    }
-
-
-    public Set<Movie> findMoviesWithSharedCinematographers(Movie movie) {
-        Set<Movie> connectedMovies = new HashSet<>();
-
-        for (String cinematographer : movie.getCinematographers()) {
-            if (moviesByCinematographer.containsKey(cinematographer)) {
-                connectedMovies.addAll(moviesByCinematographer.get(cinematographer));
-            }
-        }
-
-        // Remove the original movie from the result set
-        connectedMovies.remove(movie);
-
-        // Remove already used movies
-        connectedMovies.removeIf(m -> moviesUsed.contains(m.getMovieID()));
-
-        return connectedMovies;
-    }
-
-    public Set<Movie> findMoviesWithSharedWriters(Movie movie) {
-        Set<Movie> connectedMovies = new HashSet<>();
-
-        for (String writer : movie.getWriters()) {
-            if (moviesByWriter.containsKey(writer)) {
-                connectedMovies.addAll(moviesByWriter.get(writer));
-            }
-        }
-
-        // Remove the original movie from the result set
-        connectedMovies.remove(movie);
-
-        // Remove already used movies
-        connectedMovies.removeIf(m -> moviesUsed.contains(m.getMovieID()));
-
-        return connectedMovies;
-    }
 
 }
 
