@@ -62,7 +62,7 @@ Optional additional features employed include:
 * JavaDocs
 
 ## Authors
-This game was created by Angela Pan, Sam Polluck, and Rachel Draper.
+This game was created by Angela Pan, Sam Pollock, and Rachel Draper.
 
 ## File Structure
 Here is the current project file structure being used (to employ Spring Boot)
