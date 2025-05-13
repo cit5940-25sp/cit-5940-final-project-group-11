@@ -3,7 +3,7 @@ package com.example.movieGame;
 import java.util.Comparator;
 
 /**
- * @author ericfouh
+ * Used in autocomplete to track terms used in Nodes
  */
 public interface ITerm
     extends Comparable<ITerm> {
@@ -26,7 +26,7 @@ public interface ITerm
      * Compares the two terms in lexicographic order but using only the first r
      * characters of each query.
      * 
-     * @param r
+     * @param r number of characters of each query to be compared
      * @return comparator Object
      */
     public static Comparator<ITerm> byPrefixOrder(int r) {
@@ -94,6 +94,7 @@ public interface ITerm
      * Setter for term
      *
      * @param term term
+     * @return returns term
      */
     public String setTerm(String term);
 

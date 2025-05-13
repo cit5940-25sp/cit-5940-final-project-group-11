@@ -1,0 +1,4 @@
+3
+       10	class
+       3	clacks
+       1	clack

@@ -3,7 +3,8 @@ package com.example.movieGame;
 import java.util.List;
 
 /**
- * @author ericfouh
+ * Implements autocomplete functionality for the User Entry movie selection.
+ * Selection options are pulled from a csv file from the Kaggle database
  */
 public interface IAutocomplete {
 
@@ -52,7 +53,7 @@ public interface IAutocomplete {
      * original Terms; otherwise, the user might be able to change the structure of your
      * Trie based on the values returned.
      *
-     * @param prefix
+     * @param prefix user typed prefix
      * @return a List containing all the ITerm objects with query starting with
      *         prefix. Return an empty list if there are no ITerm object starting
      *         with prefix.

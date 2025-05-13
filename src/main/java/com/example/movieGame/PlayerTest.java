@@ -1,8 +1,7 @@
 package com.example.movieGame;
 
 import org.junit.jupiter.api.Test;
-
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test class for Player class

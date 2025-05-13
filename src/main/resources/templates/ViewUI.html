@@ -268,10 +268,11 @@
 
         //submits the setup
         function submitSetup() {
-            const player1 = document.getElementById("player1Name").value;  //this stores the name the user types in Player#1 input field
+            const player1 = document.getElementById("player1Name").value;
             const player2 = document.getElementById("player2Name").value;
             const actorInput = document.getElementById("actorWinCondition").value.trim();
             const genreInput = document.getElementById("winCondition").value;
+
             const winCondition = actorInput !== "" ? `Actor: ${actorInput}` : genreInput;
 
             if (!player1 || !player2 || !winCondition) {
@@ -279,20 +280,53 @@
                 return;
             }
 
-            fetch("/setup", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: `player1=${encodeURIComponent(player1)}&player2=${encodeURIComponent(player2)}&winCondition=${encodeURIComponent(winCondition)}`
-            })
-                .then(response => {
-                    if (response.ok) {
+            // If actor is used, validate it
+            if (actorInput !== "") {
+                // First make a temporary gamePlay session by submitting dummy setup to ensure actorSet exists
+                fetch("/setup", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `player1=${encodeURIComponent(player1)}&player2=${encodeURIComponent(player2)}&winCondition=${encodeURIComponent(winCondition)}`
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error("Setup failed");
+
+                        // Now check actor validity
+                        return fetch(`/validateActor?actorName=${encodeURIComponent(actorInput)}`);
+                    })
+                    .then(res => res.json())
+                    .then(isValid => {
+                        if (!isValid) {
+                            alert("Actor not found. Please try a different actor.");
+                            return;
+                        }
+
+                        // If valid, redirect to game
                         showScreen('gameScreen');
                         loadGameData();
-                    } else {
-                        alert("There was an error. Please try again.");
-                    }
-                });
+                    })
+                    .catch(err => {
+                        alert("There was an error setting up the game.");
+                        console.error(err);
+                    });
+            } else {
+                // Genre flow – no need to validate
+                fetch("/setup", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `player1=${encodeURIComponent(player1)}&player2=${encodeURIComponent(player2)}&winCondition=${encodeURIComponent(winCondition)}`
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            showScreen('gameScreen');
+                            loadGameData();
+                        } else {
+                            alert("There was an error. Please try again.");
+                        }
+                    });
+            }
         }
+
     </script>
 </head>
 
@@ -359,8 +393,8 @@
             <p><b>Active Player:</b> <span id="activePlayer">Loading...</span></p>
             <!--<p><b>Active Player:</b> <span id="activePlayer" th:text="${activePlayer}">player1</span></p> -->
             <!--  <p><b>Active Player:</b> <span id="activePlayer">player1</span></p>  -->
-            <p><b>Win Condition:</b> <span id="winConditionDisplay">[Win Condition]</span></p>
-            <p><b>Rounds Played:</b> <span id="roundCount">error</span></p>
+            <p><b>Win Condition:</b> <span id="winConditionDisplay">Loading...</span></p>
+            <p><b>Rounds Played:</b> <span id="roundCount">Loading...</span></p>
         </div>
         <div class="movie-input">
             <input type="text" id="movieInput" placeholder="Enter a movie..." />
